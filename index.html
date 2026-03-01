@@ -17,11 +17,11 @@
         </span>
 
         <h1 class="mt-5 text-3xl font-bold leading-tight text-white sm:text-4xl">
-            Convert GST invoices to Excel in seconds.
+            Convert GST invoices to Excel or Tally XML in seconds.
         </h1>
 
         <p class="mt-4 text-base leading-7 text-slate-300">
-            Upload a PDF invoice and get a structured Excel sheet ready for review, reconciliation, and filing.
+            Upload a PDF invoice and get structured outputs ready for review, reconciliation, filing, and Tally import.
             Built for finance teams, CAs, and GST operators who need speed with confidence.
         </p>
 
@@ -31,12 +31,12 @@
                 <p class="mt-1 text-sm text-slate-300">Automated extraction replaces repetitive manual entry.</p>
             </div>
             <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p class="text-sm font-semibold text-white">🔒 Private by design</p>
-                <p class="mt-1 text-sm text-slate-300">Files are automatically deleted within 24 hours.</p>
+                <p class="text-sm font-semibold text-white">🔒 Supabase-backed security</p>
+                <p class="mt-1 text-sm text-slate-300">Uploads are handled through secure Supabase storage workflows.</p>
             </div>
             <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
-                <p class="text-sm font-semibold text-white">✅ Review-ready output</p>
-                <p class="mt-1 text-sm text-slate-300">Download `.xlsx` format optimized for audit checks.</p>
+                <p class="text-sm font-semibold text-white">✅ GSTIN checksum guardrails</p>
+                <p class="mt-1 text-sm text-slate-300">GSTIN values are accepted only when Mod-36 checksum validation passes.</p>
             </div>
             <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
                 <p class="text-sm font-semibold text-white">🎁 Free beta quota</p>
@@ -68,6 +68,21 @@
                     </label>
                 </div>
                 <p class="mt-2 text-xs text-slate-500">Bulk mode processes files one by one and downloads each Excel output automatically.</p>
+            </div>
+
+            <div>
+                <p class="mb-2 block text-sm font-semibold text-slate-700">Output format</p>
+                <div class="grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1">
+                    <label class="flex cursor-pointer items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition has-[:checked]:bg-white has-[:checked]:text-blue-700 has-[:checked]:shadow-sm">
+                        <input type="radio" name="outputFormat" value="xlsx" class="sr-only" checked>
+                        Excel (.xlsx)
+                    </label>
+                    <label class="flex cursor-pointer items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition has-[:checked]:bg-white has-[:checked]:text-blue-700 has-[:checked]:shadow-sm">
+                        <input type="radio" name="outputFormat" value="xml" class="sr-only">
+                        Tally XML
+                    </label>
+                </div>
+                <p class="mt-2 text-xs text-slate-500">Tally XML exports a Sales voucher payload compatible with Tally ERP 9 / Tally Prime.</p>
             </div>
 
             <div>
@@ -114,7 +129,7 @@
         <p id="statusMessage" class="mt-4 text-sm" role="status" aria-live="polite"></p>
 
         <div class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
-            ⚠ Always verify extracted data before GST filing. SmartCheck does not share your data.
+            ⚠ Always verify extracted data before GST filing/import. OCR fallback activates automatically for low-text PDFs.
         </div>
     </section>
 </main>
@@ -131,10 +146,12 @@
     const fileLabel = document.getElementById("fileLabel");
     const fileList = document.getElementById("fileList");
     const modeInputs = document.querySelectorAll('input[name="processingMode"]');
+    const outputFormatInputs = document.querySelectorAll('input[name="outputFormat"]');
     const submitButton = document.getElementById("submitButton");
     const statusMessage = document.getElementById("statusMessage");
 
     const getMode = () => document.querySelector('input[name="processingMode"]:checked')?.value || "single";
+    const getOutputFormat = () => document.querySelector('input[name="outputFormat"]:checked')?.value || "xlsx";
 
     const setStatus = (message, tone = "info") => {
         const toneClasses = {
@@ -148,9 +165,14 @@
         statusMessage.textContent = message;
     };
 
-    const setLoadingState = (isLoading, label = "Upload & Convert") => {
+    const getSubmitButtonLabel = () => {
+        const format = getOutputFormat();
+        return format === "xml" ? "Upload & Export XML" : "Upload & Convert";
+    };
+
+    const setLoadingState = (isLoading, label = getSubmitButtonLabel()) => {
         submitButton.disabled = isLoading;
-        submitButton.textContent = isLoading ? label : "Upload & Convert";
+        submitButton.textContent = isLoading ? label : getSubmitButtonLabel();
     };
 
     const updateModeUI = () => {
@@ -227,10 +249,16 @@
         URL.revokeObjectURL(objectUrl);
     };
 
-    const uploadSingleFile = async (email, file) => {
+    const getOutputFilename = (fileName, format) => {
+        const baseName = fileName.replace(/\.pdf$/i, "") || "invoice";
+        return format === "xml" ? `${baseName}_tally_sales.xml` : `${baseName}_output.xlsx`;
+    };
+
+    const uploadSingleFile = async (email, file, outputFormat) => {
         const formData = new FormData();
         formData.append("email", email);
         formData.append("file", file);
+        formData.append("output_format", outputFormat);
 
         const response = await fetch(uploadEndpoint, {
             method: "POST",
@@ -252,6 +280,7 @@
     };
 
     modeInputs.forEach((input) => input.addEventListener("change", updateModeUI));
+    outputFormatInputs.forEach((input) => input.addEventListener("change", () => setLoadingState(false)));
     fileInput.addEventListener("change", renderSelectedFiles);
     updateModeUI();
 
@@ -265,12 +294,14 @@
 
         const mode = getMode();
         const email = emailInput.value.trim();
+        const outputFormat = getOutputFormat();
+        const outputLabel = outputFormat === "xml" ? "Tally XML" : "Excel";
 
         setLoadingState(true, mode === "bulk" ? `Processing 1/${files.length}...` : "Processing...");
         setStatus(
             mode === "bulk"
-                ? `Uploading ${files.length} invoices and extracting line items...`
-                : "Uploading invoice and extracting line items...",
+                ? `Uploading ${files.length} invoices and preparing ${outputLabel} outputs...`
+                : `Uploading invoice and preparing ${outputLabel} output...`,
             "info"
         );
 
@@ -282,10 +313,10 @@
             for (let index = 0; index < files.length; index += 1) {
                 const file = files[index];
                 setLoadingState(true, `Processing ${index + 1}/${files.length}...`);
-                const outputName = `${file.name.replace(/\.pdf$/i, "") || "invoice"}_output.xlsx`;
+                const outputName = getOutputFilename(file.name, outputFormat);
 
                 try {
-                    const response = await uploadSingleFile(email, file);
+                    const response = await uploadSingleFile(email, file, outputFormat);
                     remaining = response.headers.get("X-Remaining") || remaining;
                     const blob = await response.blob();
                     downloadBlob(blob, outputName);
@@ -300,8 +331,8 @@
             if (failedFiles.length === 0) {
                 const completionMessage =
                     mode === "bulk"
-                        ? `✅ Done! ${successCount} Excel files are downloading.${remainingMessage}`
-                        : `✅ Conversion complete. Your Excel file is downloading.${remainingMessage}`;
+                        ? `✅ Done! ${successCount} ${outputLabel} files are downloading.${remainingMessage}`
+                        : `✅ Conversion complete. Your ${outputLabel} file is downloading.${remainingMessage}`;
                 setStatus(completionMessage, "success");
             } else if (successCount > 0) {
                 setStatus(
