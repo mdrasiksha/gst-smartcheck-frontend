@@ -260,12 +260,51 @@
         window.open(waitlistLink, "_blank", "noopener,noreferrer");
     };
 
+    const downloadBlob = (blob, filename) => {
+        const blobUrl = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = blobUrl;
+        anchor.download = filename;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(blobUrl);
+    };
+
+    const getDownloadFilename = (response, fallback = "tally-export.xml") => {
+        const contentDisposition = response.headers.get("Content-Disposition") || "";
+        const filenameMatch = contentDisposition.match(/filename\*?=(?:UTF-8''|\")?([^\";]+)/i);
+        if (!filenameMatch) {
+            return fallback;
+        }
+
+        return decodeURIComponent(filenameMatch[1]).replace(/[/\\]/g, "_");
+    };
+
+    const downloadTallyXml = async (invoiceId) => {
+        const response = await fetch(`${BASE_URL}/export/tally?invoice_id=${encodeURIComponent(invoiceId)}`);
+        if (!response.ok) {
+            let errorMessage = "Unable to export Tally XML right now.";
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.error || errorMessage;
+            } catch {
+                // Non-JSON error response fallback
+            }
+            throw new Error(errorMessage);
+        }
+
+        const xmlBlob = await response.blob();
+        const filename = getDownloadFilename(response, `invoice-${invoiceId}.xml`);
+        downloadBlob(xmlBlob, filename);
+    };
+
     const setTallyButtonLockedState = () => {
         tallyLockedButton.textContent = "🔒 Export Tally XML";
         tallyLockedButton.classList.remove("border-emerald-200", "text-emerald-700", "hover:bg-emerald-50");
         tallyLockedButton.classList.add("border-slate-300", "text-slate-700", "hover:bg-slate-100");
         tallyLockedButton.dataset.locked = "true";
-        tallyLockedButton.removeAttribute("data-tally-url");
+        tallyLockedButton.removeAttribute("data-invoice-id");
         tallyLockedMessage.classList.add("hidden");
     };
 
@@ -274,7 +313,7 @@
         tallyLockedButton.classList.remove("border-slate-300", "text-slate-700", "hover:bg-slate-100");
         tallyLockedButton.classList.add("border-emerald-200", "text-emerald-700", "hover:bg-emerald-50");
         tallyLockedButton.dataset.locked = "false";
-        tallyLockedButton.dataset.tallyUrl = `${BASE_URL}/export/tally?invoice_id=${invoiceId}`;
+        tallyLockedButton.dataset.invoiceId = invoiceId;
         tallyLockedMessage.classList.add("hidden");
     };
 
@@ -540,12 +579,24 @@
     });
 
     modalGetProButton.addEventListener("click", openWaitlist);
-    tallyLockedButton.addEventListener("click", () => {
-        if (tallyLockedButton.dataset.locked === "false" && tallyLockedButton.dataset.tallyUrl) {
-            window.open(tallyLockedButton.dataset.tallyUrl, "_blank", "noopener,noreferrer");
+    tallyLockedButton.addEventListener("click", async () => {
+        const canDownloadXml = tallyLockedButton.dataset.locked === "false" && tallyLockedButton.dataset.invoiceId;
+
+        if (!canDownloadXml) {
+            tallyLockedMessage.classList.remove("hidden");
             return;
         }
-        tallyLockedMessage.classList.remove("hidden");
+
+        const invoiceId = tallyLockedButton.dataset.invoiceId;
+
+        try {
+            setStatus("Preparing your Tally XML download...", "info");
+            await downloadTallyXml(invoiceId);
+            setStatus("✅ Tally XML download started.", "success");
+            tallyLockedMessage.classList.add("hidden");
+        } catch (error) {
+            setStatus(`❌ ${error.message || "Unable to download Tally XML."}`, "error");
+        }
     });
     closeSuccessModal.addEventListener("click", closeModal);
     modalDoneButton.addEventListener("click", closeModal);
