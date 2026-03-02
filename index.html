@@ -167,7 +167,7 @@
         <div class="mt-5 grid gap-4 md:grid-cols-2">
             <article class="rounded-2xl border border-white/10 bg-white/5 p-5">
                 <p class="text-lg font-semibold text-white">Free</p>
-                <p class="mt-2 text-sm text-slate-300">10 Invoices/mo, Excel Only.</p>
+                <p class="mt-2 text-sm text-slate-300">10 Invoices/mo, includes Excel + Tally XML.</p>
             </article>
             <article class="rounded-2xl border border-[#25D366]/40 bg-[#25D366]/10 p-5">
                 <p class="text-lg font-semibold text-white">Pro</p>
@@ -261,6 +261,15 @@
 
     const updateUsageBadge = () => {
         usageBadge.textContent = `You have used ${Math.min(usedFreeUploads, FREE_UPLOAD_LIMIT)}/${FREE_UPLOAD_LIMIT} free uploads`;
+    };
+
+    const syncUsageFromRemaining = (remaining) => {
+        if (remaining === null || remaining === undefined || Number.isNaN(Number(remaining))) {
+            return;
+        }
+
+        usedFreeUploads = FREE_UPLOAD_LIMIT - Number(remaining);
+        updateUsageBadge();
     };
 
     const openSuccessModal = (message, isVerified) => {
@@ -416,6 +425,7 @@
             const error = new Error(message);
             error.code = response.status;
             error.action = action;
+            error.remaining = response.headers.get("X-Remaining");
             throw error;
         }
 
@@ -474,10 +484,7 @@
                 }
             }
 
-            if (remaining !== null && !Number.isNaN(Number(remaining))) {
-                usedFreeUploads = FREE_UPLOAD_LIMIT - Number(remaining);
-                updateUsageBadge();
-            }
+            syncUsageFromRemaining(remaining);
 
             const remainingMessage = remaining ? ` Free uploads remaining: ${remaining}.` : "";
 
@@ -501,8 +508,15 @@
             renderSelectedFiles();
         } catch (error) {
             const errorMessage = error.message || "Backend not reachable.";
+            syncUsageFromRemaining(error.remaining);
             setStatus(`❌ ${errorMessage}`, "error");
-            if (error.code === 403 || error.action === "upgrade" || /limit reached|quota|free uploads/i.test(errorMessage)) {
+
+            const isLimitReached =
+                Number.isFinite(usedFreeUploads) && usedFreeUploads >= FREE_UPLOAD_LIMIT;
+            const shouldPromptUpgrade =
+                isLimitReached || /limit reached|quota|free uploads/i.test(errorMessage);
+
+            if (shouldPromptUpgrade && (error.code === 403 || error.action === "upgrade" || isLimitReached)) {
                 openLimitReachedModal();
             }
         } finally {
