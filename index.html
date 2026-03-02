@@ -225,7 +225,8 @@
     const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
     const MAX_BULK_FILES = 20;
     const FREE_UPLOAD_LIMIT = 10;
-    const uploadEndpoint = "https://gst-smartcheck.onrender.com/upload";
+    const BASE_URL = "https://gst-smartcheck.onrender.com";
+    const uploadEndpoint = `${BASE_URL}/upload`;
     const waitlistLink = "https://wa.me/918722250407?text=Hi,%20I%27m%20interested%20in%20the%20GST%20SmartCheck%20Pro%20Plan.";
 
     const form = document.getElementById("uploadForm");
@@ -257,6 +258,24 @@
 
     const openWaitlist = () => {
         window.open(waitlistLink, "_blank", "noopener,noreferrer");
+    };
+
+    const setTallyButtonLockedState = () => {
+        tallyLockedButton.textContent = "🔒 Export Tally XML";
+        tallyLockedButton.classList.remove("border-emerald-200", "text-emerald-700", "hover:bg-emerald-50");
+        tallyLockedButton.classList.add("border-slate-300", "text-slate-700", "hover:bg-slate-100");
+        tallyLockedButton.dataset.locked = "true";
+        tallyLockedButton.removeAttribute("data-tally-url");
+        tallyLockedMessage.classList.add("hidden");
+    };
+
+    const setTallyButtonUnlockedState = (invoiceId) => {
+        tallyLockedButton.textContent = "Export Tally XML";
+        tallyLockedButton.classList.remove("border-slate-300", "text-slate-700", "hover:bg-slate-100");
+        tallyLockedButton.classList.add("border-emerald-200", "text-emerald-700", "hover:bg-emerald-50");
+        tallyLockedButton.dataset.locked = "false";
+        tallyLockedButton.dataset.tallyUrl = `${BASE_URL}/export/tally?invoice_id=${invoiceId}`;
+        tallyLockedMessage.classList.add("hidden");
     };
 
     const updateUsageBadge = () => {
@@ -387,20 +406,6 @@
         return files;
     };
 
-    const downloadBlob = (blob, filename) => {
-        const objectUrl = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = objectUrl;
-        link.download = filename;
-        link.click();
-        URL.revokeObjectURL(objectUrl);
-    };
-
-    const getOutputFilename = (fileName, format) => {
-        const baseName = fileName.replace(/\.pdf$/i, "") || "invoice";
-        return format === "xml" ? `${baseName}_tally_sales.xml` : `${baseName}_output.xlsx`;
-    };
-
     const uploadSingleFile = async (email, file, outputFormat) => {
         const formData = new FormData();
         formData.append("email", email);
@@ -463,18 +468,23 @@
             let successCount = 0;
             const failedFiles = [];
             let checksumPassed = false;
+            let lastResult = null;
 
             for (let index = 0; index < files.length; index += 1) {
                 const file = files[index];
                 setLoadingState(true, `Processing ${index + 1}/${files.length}...`);
-                const outputName = getOutputFilename(file.name, outputFormat);
 
                 try {
                     const response = await uploadSingleFile(email, file, outputFormat);
                     remaining = response.headers.get("X-Remaining") || remaining;
                     checksumPassed = checksumPassed || response.headers.get("X-GSTIN-Checksum") === "pass";
-                    const blob = await response.blob();
-                    downloadBlob(blob, outputName);
+                    const result = await response.json();
+                    const filename = result?.file_url?.split("/").pop();
+                    if (!filename) {
+                        throw new Error(`Missing download URL for ${file.name}.`);
+                    }
+                    window.location.href = `${BASE_URL}/downloads/${filename}`;
+                    lastResult = result;
                     successCount += 1;
                 } catch (error) {
                     if (error.code === 403 || error.action === "upgrade") {
@@ -494,6 +504,11 @@
                         ? `✅ Done! ${successCount} ${outputLabel} files are downloading.${remainingMessage}`
                         : `✅ Conversion complete. Your ${outputLabel} file is downloading.${remainingMessage}`;
                 setStatus(completionMessage, "success");
+                if (lastResult?.can_download_xml && lastResult?.invoice_id) {
+                    setTallyButtonUnlockedState(lastResult.invoice_id);
+                } else {
+                    setTallyButtonLockedState();
+                }
                 openSuccessModal(completionMessage, checksumPassed);
             } else if (successCount > 0) {
                 setStatus(
@@ -526,6 +541,10 @@
 
     modalGetProButton.addEventListener("click", openWaitlist);
     tallyLockedButton.addEventListener("click", () => {
+        if (tallyLockedButton.dataset.locked === "false" && tallyLockedButton.dataset.tallyUrl) {
+            window.open(tallyLockedButton.dataset.tallyUrl, "_blank", "noopener,noreferrer");
+            return;
+        }
         tallyLockedMessage.classList.remove("hidden");
     });
     closeSuccessModal.addEventListener("click", closeModal);
@@ -544,6 +563,7 @@
     });
 
     updateUsageBadge();
+    setTallyButtonLockedState();
 })();
 </script>
 
