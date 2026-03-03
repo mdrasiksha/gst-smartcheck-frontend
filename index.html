@@ -216,8 +216,8 @@
 
 <div id="limitReachedModal" class="fixed inset-0 z-30 hidden items-center justify-center bg-slate-900/70 p-4">
     <div class="w-full max-w-md rounded-2xl bg-white p-6 text-slate-900 shadow-2xl">
-        <h3 class="text-lg font-bold">Free Limit Reached</h3>
-        <p class="mt-2 text-sm text-slate-700">You have reached your 10 free uploads this month. Upgrade to Pro for unlimited access.</p>
+        <h3 class="text-lg font-bold">Upgrade to Pro</h3>
+        <p class="mt-2 text-sm text-slate-700">Your current plan cannot process this request. Upgrade to Pro for unlimited access.</p>
         <div class="mt-5 flex gap-3">
             <button id="limitWhatsappButton" type="button" class="flex-1 rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1fb85a]">Chat with Developer for Unlimited Access</button>
             <button id="closeLimitModalButton" type="button" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">Close</button>
@@ -619,9 +619,12 @@
             const isLimitReached =
                 Number.isFinite(usedFreeUploads) && usedFreeUploads >= FREE_UPLOAD_LIMIT;
             const shouldPromptUpgrade =
-                isLimitReached || /limit reached|quota|free uploads/i.test(errorMessage);
+                error.code === 403 ||
+                error.action === "upgrade" ||
+                isLimitReached ||
+                /limit reached|quota|free uploads/i.test(errorMessage);
 
-            if (shouldPromptUpgrade && (error.code === 403 || error.action === "upgrade" || isLimitReached)) {
+            if (shouldPromptUpgrade) {
                 openLimitReachedModal();
             }
         } finally {
