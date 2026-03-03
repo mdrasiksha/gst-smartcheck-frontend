@@ -484,7 +484,7 @@
         const formData = new FormData();
         formData.append("email", email);
         formData.append("file", file);
-        formData.append("output_format", outputFormat);
+        formData.append("output_format", outputFormat || "xlsx");
 
         const response = await fetch(uploadEndpoint, {
             method: "POST",
@@ -552,19 +552,29 @@
                     const response = await uploadSingleFile(email, file, outputFormat);
                     remaining = response.headers.get("X-Remaining") || remaining;
                     checksumPassed = checksumPassed || response.headers.get("X-GSTIN-Checksum") === "pass";
-                    const result = await response.json();
-                    latestExtraction = {
-                        invoiceNumber: readValue(result?.invoice_number || result?.invoiceNumber || result?.invoice_no),
-                        taxableAmount: readValue(result?.taxable_amount || result?.taxableAmount || result?.taxable_value),
-                        finalAmount: readValue(result?.final_amount || result?.finalAmount || result?.total_amount),
-                        validationStatus: readValue(result?.validation_status || result?.validationStatus || "Unknown", "Unknown")
-                    };
-                    const filename = result?.file_url?.split("/").pop();
-                    if (!filename) {
-                        throw new Error(`Missing download URL for ${file.name}.`);
+                    const contentType = (response.headers.get("Content-Type") || "").toLowerCase();
+
+                    if (contentType.includes("xml")) {
+                        const xmlBlob = await response.blob();
+                        const baseFilename = file.name.replace(/\.pdf$/i, "") || "invoice";
+                        const filename = getDownloadFilename(response, `${baseFilename}.xml`);
+                        downloadBlob(xmlBlob, filename);
+                    } else {
+                        const result = await response.json();
+                        latestExtraction = {
+                            invoiceNumber: readValue(result?.invoice_number || result?.invoiceNumber || result?.invoice_no),
+                            taxableAmount: readValue(result?.taxable_amount || result?.taxableAmount || result?.taxable_value),
+                            finalAmount: readValue(result?.final_amount || result?.finalAmount || result?.total_amount),
+                            validationStatus: readValue(result?.validation_status || result?.validationStatus || "Unknown", "Unknown")
+                        };
+                        const filename = result?.file_url?.split("/").pop();
+                        if (!filename) {
+                            throw new Error(`Missing download URL for ${file.name}.`);
+                        }
+                        window.location.href = `${BASE_URL}/downloads/${filename}`;
+                        lastResult = result;
                     }
-                    window.location.href = `${BASE_URL}/downloads/${filename}`;
-                    lastResult = result;
+
                     successCount += 1;
                 } catch (error) {
                     if (error.code === 403 || error.action === "upgrade") {
