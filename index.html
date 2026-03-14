@@ -545,6 +545,42 @@
         return response;
     };
 
+    const uploadBulkFiles = async (email, files, outputFormat) => {
+        const formData = new FormData();
+        formData.append("email", email);
+        formData.append("output_format", outputFormat || "xlsx");
+
+        files.forEach((file, index) => {
+            setLoadingState(true, `Processing ${index + 1}/${files.length}...`);
+            formData.append("files", file);
+        });
+
+        const response = await fetch(`${BASE_URL}/upload-bulk`, {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response.ok) {
+            let message = "Bulk upload failed.";
+            let action = null;
+            try {
+                const errorData = await response.json();
+                message = errorData.error || message;
+                action = errorData.action || null;
+            } catch {
+                // Non-JSON error response fallback
+            }
+
+            const error = new Error(message);
+            error.code = response.status;
+            error.action = action;
+            error.remaining = response.headers.get("X-Remaining");
+            throw error;
+        }
+
+        return response;
+    };
+
     modeInputs.forEach((input) => input.addEventListener("change", updateModeUI));
     outputFormatInputs.forEach((input) => input.addEventListener("change", () => setLoadingState(false)));
     fileInput.addEventListener("change", renderSelectedFiles);
@@ -570,12 +606,9 @@
         const outputLabel = outputFormat === "xml" ? "Tally XML" : "Excel";
 
         setLoadingState(true, mode === "bulk" ? `Processing 1/${files.length}...` : "Processing...");
-        setStatus(
-            mode === "bulk"
-                ? `Uploading ${files.length} invoices and preparing ${outputLabel} outputs...`
-                : `Uploading invoice and preparing ${outputLabel} output...`,
-            "info"
-        );
+        setStatus(mode === "bulk"
+            ? `Uploading ${files.length} invoices and generating summary report...`
+            : `Uploading invoice and preparing ${outputLabel} output...`, "info");
 
         try {
             let remaining = null;
@@ -584,43 +617,51 @@
             let checksumPassed = false;
             let lastResult = null;
 
-            for (let index = 0; index < files.length; index += 1) {
-                const file = files[index];
-                setLoadingState(true, `Processing ${index + 1}/${files.length}...`);
+            if (mode === "bulk") {
+                const bulkResponse = await uploadBulkFiles(email, files, outputFormat);
+                remaining = bulkResponse.headers.get("X-Remaining") || remaining;
+                const bulkBlob = await bulkResponse.blob();
+                downloadBlob(bulkBlob, "bulk_invoice_results.zip");
+                successCount = files.length;
+            } else {
+                for (let index = 0; index < files.length; index += 1) {
+                    const file = files[index];
+                    setLoadingState(true, `Processing ${index + 1}/${files.length}...`);
 
-                try {
-                    const response = await uploadSingleFile(email, file, outputFormat);
-                    remaining = response.headers.get("X-Remaining") || remaining;
-                    checksumPassed = checksumPassed || response.headers.get("X-GSTIN-Checksum") === "pass";
-                    const contentType = (response.headers.get("Content-Type") || "").toLowerCase();
+                    try {
+                        const response = await uploadSingleFile(email, file, outputFormat);
+                        remaining = response.headers.get("X-Remaining") || remaining;
+                        checksumPassed = checksumPassed || response.headers.get("X-GSTIN-Checksum") === "pass";
+                        const contentType = (response.headers.get("Content-Type") || "").toLowerCase();
 
-                    if (contentType.includes("xml")) {
-                        const xmlBlob = await response.blob();
-                        const baseFilename = file.name.replace(/\.pdf$/i, "") || "invoice";
-                        const filename = getDownloadFilename(response, `${baseFilename}.xml`);
-                        downloadBlob(xmlBlob, filename);
-                    } else {
-                        const result = await response.json();
-                        latestExtraction = {
-                            invoiceNumber: readValue(result?.invoice_number || result?.invoiceNumber || result?.invoice_no),
-                            taxableAmount: readValue(result?.taxable_amount || result?.taxableAmount || result?.taxable_value),
-                            finalAmount: readValue(result?.final_amount || result?.finalAmount || result?.total_amount),
-                            validationStatus: readValue(result?.validation_status || result?.validationStatus || "Unknown", "Unknown")
-                        };
-                        const filename = result?.file_url?.split("/").pop();
-                        if (!filename) {
-                            throw new Error(`Missing download URL for ${file.name}.`);
+                        if (contentType.includes("xml")) {
+                            const xmlBlob = await response.blob();
+                            const baseFilename = file.name.replace(/\.pdf$/i, "") || "invoice";
+                            const filename = getDownloadFilename(response, `${baseFilename}.xml`);
+                            downloadBlob(xmlBlob, filename);
+                        } else {
+                            const result = await response.json();
+                            latestExtraction = {
+                                invoiceNumber: readValue(result?.invoice_number || result?.invoiceNumber || result?.invoice_no),
+                                taxableAmount: readValue(result?.taxable_amount || result?.taxableAmount || result?.taxable_value),
+                                finalAmount: readValue(result?.final_amount || result?.finalAmount || result?.total_amount),
+                                validationStatus: readValue(result?.validation_status || result?.validationStatus || "Unknown", "Unknown")
+                            };
+                            const filename = result?.file_url?.split("/").pop();
+                            if (!filename) {
+                                throw new Error(`Missing download URL for ${file.name}.`);
+                            }
+                            window.location.href = `${BASE_URL}/downloads/${filename}`;
+                            lastResult = result;
                         }
-                        window.location.href = `${BASE_URL}/downloads/${filename}`;
-                        lastResult = result;
-                    }
 
-                    successCount += 1;
-                } catch (error) {
-                    if (error.code === 403 || error.action === "upgrade") {
-                        throw error;
+                        successCount += 1;
+                    } catch (error) {
+                        if (error.code === 403 || error.action === "upgrade") {
+                            throw error;
+                        }
+                        failedFiles.push(`${file.name}: ${error.message}`);
                     }
-                    failedFiles.push(`${file.name}: ${error.message}`);
                 }
             }
 
@@ -631,7 +672,7 @@
             if (failedFiles.length === 0) {
                 const completionMessage =
                     mode === "bulk"
-                        ? `✅ Done! ${successCount} ${outputLabel} files are downloading.${remainingMessage}`
+                        ? `✅ Bulk processing complete. Summary Excel downloaded.${remainingMessage}`
                         : `✅ Conversion complete. Your ${outputLabel} file is downloading.${remainingMessage}`;
                 setStatus(completionMessage, "success");
                 if (lastResult?.can_download_xml && lastResult?.invoice_id) {
