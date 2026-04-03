@@ -78,12 +78,12 @@
                         type="file"
                         id="invoiceFile"
                         name="invoiceFile"
-                        accept="application/pdf,.pdf"
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png,image/webp"
                         required
                         class="w-full cursor-pointer text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-slate-700"
                         aria-describedby="fileHint"
                     >
-                    <p id="fileHint" class="mt-2 text-xs text-slate-500">PDF only • Maximum file size: 10MB</p>
+                    <p id="fileHint" class="mt-2 text-xs text-slate-500">Supported: PDF, DOC, DOCX, JPG, JPEG, PNG, WEBP • Maximum file size: 10MB</p>
                     <ul id="fileList" class="mt-3 space-y-1 text-xs text-slate-600"></ul>
                 </div>
             </div>
@@ -197,6 +197,15 @@
 <script>
 (() => {
     const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+    const SUPPORTED_FILE_EXTENSIONS = [".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png", ".webp"];
+    const SUPPORTED_FILE_MIME_TYPES = new Set([
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "image/jpeg",
+        "image/png",
+        "image/webp"
+    ]);
     const FREE_UPLOAD_LIMIT = 10;
     const BASE_URL = "https://gst-smartcheck-docker.onrender.com";
     const uploadEndpoint = `${BASE_URL}/upload`;
@@ -405,6 +414,14 @@
         submitSpinner.classList.toggle("hidden", !isLoading);
     };
 
+    const isSupportedFile = (file) => {
+        const fileName = (file.name || "").toLowerCase();
+        const fileType = (file.type || "").toLowerCase();
+        const hasSupportedExtension = SUPPORTED_FILE_EXTENSIONS.some((extension) => fileName.endsWith(extension));
+        const hasSupportedMimeType = SUPPORTED_FILE_MIME_TYPES.has(fileType);
+        return hasSupportedExtension || hasSupportedMimeType;
+    };
+
     const renderSelectedFiles = () => {
         const files = Array.from(fileInput.files || []);
         if (!files.length) {
@@ -432,21 +449,20 @@
         }
 
         if (!files.length) {
-            setStatus("❌ Please upload a PDF invoice.", "error");
+            setStatus("❌ Please upload an invoice in a supported format.", "error");
             fileInput.focus();
             return null;
         }
 
         for (const file of files) {
-            const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith(".pdf");
-            if (!isPdf) {
-                setStatus(`❌ ${file.name} is not a PDF. Only PDF files are supported.`, "error");
+            if (!isSupportedFile(file)) {
+                setStatus(`❌ ${file.name} is not supported. Upload PDF, DOC, DOCX, JPG, JPEG, PNG, or WEBP files.`, "error");
                 fileInput.focus();
                 return null;
             }
 
             if (file.size > MAX_FILE_SIZE_BYTES) {
-                setStatus(`❌ ${file.name} is too large. Upload a PDF smaller than 10MB.`, "error");
+                setStatus(`❌ ${file.name} is too large. Upload a file smaller than 10MB.`, "error");
                 fileInput.focus();
                 return null;
             }
