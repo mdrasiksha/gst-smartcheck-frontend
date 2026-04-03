@@ -8,114 +8,197 @@
 </head>
 
 <body class="min-h-screen bg-slate-950 text-slate-100">
-<div class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,#1e1b4b,transparent_35%),radial-gradient(circle_at_15%_20%,#1d4ed8,transparent_45%),radial-gradient(circle_at_85%_0%,#0f172a,transparent_55%)] opacity-95"></div>
+<div class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,#1e3a8a,transparent_55%),radial-gradient(circle_at_80%_20%,#0f766e,transparent_40%),radial-gradient(circle_at_20%_80%,#4f46e5,transparent_45%)] opacity-60"></div>
 
-<header class="mx-auto w-full max-w-[900px] px-4 pt-6">
-    <nav class="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 shadow-lg backdrop-blur-xl">
+<header class="mx-auto w-full max-w-6xl px-4 pt-6">
+    <nav class="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 shadow-lg backdrop-blur">
         <p class="text-sm font-semibold tracking-wide text-slate-100">SmartCheck GST</p>
         <a
             id="navGetProButton"
             href="https://wa.me/918722250407?text=Hi,%20I%27m%20interested%20in%20the%20GST%20SmartCheck%20Pro%20Plan."
             target="_blank"
             rel="noopener noreferrer"
-            class="rounded-xl border border-white/10 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
+            class="rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1fb85a]"
         >
             Get Pro
         </a>
     </nav>
 </header>
 
-<main class="mx-auto w-full max-w-[900px] px-4 pb-12 pt-8">
-    <section class="rounded-3xl border border-white/10 bg-gradient-to-br from-slate-950/70 via-slate-900/70 to-blue-950/80 p-8 shadow-2xl shadow-blue-950/30 backdrop-blur-xl sm:p-10">
-        <div class="inline-flex items-center gap-2 rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-cyan-200">
-            <span class="h-2 w-2 rounded-full bg-cyan-300"></span>
-            Beta
+<main class="mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center gap-8 p-4 py-10 lg:flex-row lg:items-stretch lg:gap-10">
+    <section class="rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-2xl backdrop-blur lg:w-1/2">
+        <span class="inline-flex items-center rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-cyan-300">
+            SmartCheck GST
+        </span>
+
+        <h1 class="mt-5 text-3xl font-bold leading-tight text-white sm:text-4xl">
+            Convert GST invoices to Excel or Tally XML in seconds.
+        </h1>
+
+        <p class="mt-4 text-base leading-7 text-slate-300">
+            Upload a PDF invoice and get structured outputs ready for review, reconciliation, filing, and Tally import.
+            Built for finance teams, CAs, and GST operators who need speed with confidence.
+        </p>
+
+        <div class="mt-8 grid gap-4 sm:grid-cols-2">
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-sm font-semibold text-white">⚡ Faster processing</p>
+                <p class="mt-1 text-sm text-slate-300">Automated extraction replaces repetitive manual entry.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-sm font-semibold text-white">🔒 Supabase-backed security</p>
+                <p class="mt-1 text-sm text-slate-300">Uploads are handled through secure Supabase storage workflows.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-sm font-semibold text-white">✅ GSTIN checksum guardrails</p>
+                <p class="mt-1 text-sm text-slate-300">GSTIN values are accepted only when Mod-36 checksum validation passes.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-sm font-semibold text-white">🎁 Free beta quota</p>
+                <p class="mt-1 text-sm text-slate-300">Get 10 free uploads while the product is in beta.</p>
+            </div>
         </div>
-        <h1 class="mt-5 text-3xl font-bold tracking-tight text-white sm:text-4xl">Upload GST Invoice</h1>
-        <p class="mt-2 text-base text-slate-300 sm:text-lg">Convert to Excel or Tally XML instantly</p>
     </section>
 
-    <section class="mt-6 rounded-3xl border border-white/10 bg-white/10 p-6 shadow-2xl shadow-slate-950/40 backdrop-blur-2xl sm:p-8">
-        <div class="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-white/10 pb-5">
-            <p class="text-sm text-slate-200">Trusted by GST operators and finance teams</p>
-            <span id="usageBadge" class="rounded-full border border-blue-300/30 bg-blue-400/10 px-3 py-1 text-xs font-semibold text-blue-200">
-                10 free invoices remaining
-            </span>
+    <section class="rounded-3xl border border-white/15 bg-white p-8 text-slate-900 shadow-2xl lg:w-1/2">
+        <div class="mb-6 flex items-center justify-between gap-4">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#4169E1]">Invoice Converter</p>
+                <h2 class="mt-1 text-2xl font-bold">Upload & convert</h2>
+            </div>
+            <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-600">Beta Access</span>
         </div>
 
-        <form id="uploadForm" novalidate class="space-y-6">
-            <input type="radio" name="processingMode" value="single" class="sr-only" checked>
-            <input type="radio" name="processingMode" value="bulk" class="sr-only">
-
+        <form id="uploadForm" novalidate class="space-y-5">
             <div>
-                <label for="invoiceFile" id="fileLabel" class="mb-3 block text-sm font-semibold text-slate-100">Invoice PDF</label>
-                <label for="invoiceFile" class="group block cursor-pointer rounded-2xl border-2 border-dashed border-white/20 bg-slate-900/40 p-8 text-center transition duration-300 hover:border-blue-400/70 hover:bg-slate-900/80">
-                    <div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 text-2xl text-blue-200">☁️</div>
-                    <p class="text-base font-semibold text-white">Drag & drop your invoice PDF</p>
-                    <p class="mt-1 text-sm text-blue-200/90">or click to browse</p>
-                    <p id="fileHint" class="mt-4 text-xs text-slate-400">PDF only • Maximum file size: 10MB each</p>
-                    <input
-                        type="file"
-                        id="invoiceFile"
-                        name="invoiceFile"
-                        accept="application/pdf,.pdf"
-                        required
-                        class="sr-only"
-                        aria-describedby="fileHint"
-                    >
-                </label>
-                <ul id="fileList" class="mt-3 space-y-1 text-sm text-slate-300"></ul>
+                <p class="mb-2 block text-sm font-semibold text-slate-700">Processing mode</p>
+                <div class="grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1">
+                    <label class="flex cursor-pointer items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition has-[:checked]:bg-white has-[:checked]:text-[#4169E1] has-[:checked]:shadow-sm">
+                        <input type="radio" name="processingMode" value="single" class="sr-only" checked>
+                        Single PDF
+                    </label>
+                    <label class="flex cursor-pointer items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition has-[:checked]:bg-white has-[:checked]:text-[#4169E1] has-[:checked]:shadow-sm">
+                        <input type="radio" name="processingMode" value="bulk" class="sr-only">
+                        Bulk PDFs
+                    </label>
+                </div>
+                <p class="mt-2 text-xs text-slate-500">Bulk mode processes files one by one and downloads each Excel output automatically.</p>
             </div>
 
-            <div class="border-t border-white/10 pt-6">
-                <label for="email" class="mb-2 block text-sm font-semibold text-slate-100">Email</label>
+            <div>
+                <p class="mb-2 block text-sm font-semibold text-slate-700">Output format</p>
+                <div class="grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1">
+                    <label class="flex cursor-pointer items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition has-[:checked]:bg-white has-[:checked]:text-[#4169E1] has-[:checked]:shadow-sm">
+                        <input type="radio" name="outputFormat" value="xlsx" class="sr-only" checked>
+                        Excel (.xlsx)
+                    </label>
+                    <label class="flex cursor-pointer items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition has-[:checked]:bg-white has-[:checked]:text-[#4169E1] has-[:checked]:shadow-sm">
+                        <input type="radio" name="outputFormat" value="xml" class="sr-only">
+                        Tally XML
+                    </label>
+                </div>
+                <p class="mt-2 text-xs text-slate-500">Tally XML exports a Sales voucher payload compatible with Tally ERP 9 / Tally Prime.</p>
+            </div>
+
+            <div>
+                <label for="email" class="mb-2 block text-sm font-semibold text-slate-700">Email ID</label>
                 <input
                     type="email"
                     id="email"
                     name="email"
                     required
                     autocomplete="email"
-                    class="w-full rounded-xl border border-white/15 bg-slate-950/70 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-blue-400 focus:ring-4 focus:ring-blue-500/20"
-                    placeholder="name@company.com"
+                    class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    placeholder="name@example.com"
+                    aria-describedby="emailHint"
                 >
-                <label for="rememberEmail" class="mt-3 inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-300">
-                    <input type="checkbox" id="rememberEmail" name="rememberEmail" class="h-4 w-4 rounded border-white/20 bg-slate-900 accent-blue-500">
+                <label for="rememberEmail" class="mt-3 inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-700">
+                    <input
+                        type="checkbox"
+                        id="rememberEmail"
+                        name="rememberEmail"
+                        class="h-4 w-4 rounded border-slate-300 accent-[#4169E1]"
+                    >
                     <span>Remember me</span>
                 </label>
+                <p id="emailHint" class="mt-2 text-xs text-slate-500">We only use this for upload tracking and support communication.</p>
             </div>
 
             <div>
-                <p class="mb-2 block text-sm font-semibold text-slate-100">Output format</p>
-                <div class="inline-grid grid-cols-2 gap-2 rounded-full border border-white/10 bg-slate-900/70 p-1">
-                    <label class="flex cursor-pointer items-center justify-center rounded-full px-4 py-2 text-sm font-medium text-slate-300 transition has-[:checked]:bg-gradient-to-r has-[:checked]:from-blue-600 has-[:checked]:to-indigo-600 has-[:checked]:text-white has-[:checked]:shadow-lg">
-                        <input type="radio" name="outputFormat" value="xlsx" class="sr-only" checked>
-                        Excel
-                    </label>
-                    <label class="flex cursor-pointer items-center justify-center rounded-full px-4 py-2 text-sm font-medium text-slate-300 transition has-[:checked]:bg-gradient-to-r has-[:checked]:from-blue-600 has-[:checked]:to-indigo-600 has-[:checked]:text-white has-[:checked]:shadow-lg">
-                        <input type="radio" name="outputFormat" value="xml" class="sr-only">
-                        Tally XML
-                    </label>
+                <label for="invoiceFile" id="fileLabel" class="mb-2 block text-sm font-semibold text-slate-700">Invoice PDF</label>
+                <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4">
+                    <input
+                        type="file"
+                        id="invoiceFile"
+                        name="invoiceFile"
+                        accept="application/pdf,.pdf"
+                        required
+                        class="w-full cursor-pointer text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-slate-700"
+                        aria-describedby="fileHint"
+                    >
+                    <p id="fileHint" class="mt-2 text-xs text-slate-500">PDF only • Maximum file size: 10MB each</p>
+                    <ul id="fileList" class="mt-3 space-y-1 text-xs text-slate-600"></ul>
                 </div>
             </div>
 
             <button
                 id="submitButton"
                 type="submit"
-                class="active:scale-[0.99] flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3.5 text-base font-semibold text-white shadow-lg shadow-blue-900/40 transition duration-200 hover:from-blue-500 hover:to-indigo-500 disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+                class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#4169E1] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#4169E1]/30 transition hover:bg-[#3558bd] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
             >
-                <span id="submitSpinner" class="hidden h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white"></span>
-                <span id="submitButtonText">Convert Invoice</span>
+                <span id="submitSpinner" class="hidden h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"></span>
+                <span id="submitButtonText">Upload & Convert</span>
             </button>
-
-            <p id="statusMessage" class="min-h-6 text-sm text-slate-200" role="status" aria-live="polite"></p>
-
-            <div class="flex items-center justify-between border-t border-white/10 pt-4 text-xs text-slate-400">
-                <p>Need help with a failed conversion?</p>
-                <button id="reportIssueButton" type="button" class="font-medium text-blue-300 transition hover:text-blue-200 hover:underline">Report issue</button>
+            <div class="mt-2 flex justify-end">
+                <button id="reportIssueButton" type="button" class="text-xs font-normal text-blue-600 transition hover:text-blue-700 hover:underline">
+                    Report issue
+                </button>
             </div>
         </form>
+
+        <p id="statusMessage" class="mt-4 text-sm" role="status" aria-live="polite"></p>
+
+        <div class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
+            ⚠ Always verify extracted data before GST filing/import. OCR fallback activates automatically for low-text PDFs.
+        </div>
+
+        <div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <div class="mb-2 flex items-center justify-between">
+                <p class="text-sm font-semibold text-slate-900">Recent Extractions</p>
+                <span id="usageBadge" class="rounded-full bg-[#4169E1]/10 px-3 py-1 text-xs font-semibold text-[#4169E1]">
+                    You have used 0/10 free uploads
+                </span>
+            </div>
+            <p class="text-xs text-slate-600">Track your free quota usage before switching to Pro for unlimited extraction.</p>
+        </div>
     </section>
 </main>
+
+<section class="mx-auto w-full max-w-6xl px-4 pb-12">
+    <div class="rounded-3xl border border-white/10 bg-slate-900/70 p-6 shadow-2xl backdrop-blur">
+        <h3 class="text-2xl font-bold text-white">Pricing</h3>
+        <p class="mt-2 text-sm text-slate-300">Choose the plan that fits your extraction volume.</p>
+        <div class="mt-5 grid gap-4 md:grid-cols-2">
+            <article class="rounded-2xl border border-white/10 bg-white/5 p-5">
+                <p class="text-lg font-semibold text-white">Free</p>
+                <p class="mt-2 text-sm text-slate-300">10 Invoices/mo, includes Excel + Tally XML.</p>
+            </article>
+            <article class="rounded-2xl border border-[#25D366]/40 bg-[#25D366]/10 p-5">
+                <p class="text-lg font-semibold text-white">Pro</p>
+                <p class="mt-2 text-sm text-slate-100">Unlimited Invoices, Tally XML Export, and Priority Support.</p>
+                <a
+                    id="pricingProButton"
+                    href="https://wa.me/918722250407?text=Hi,%20I%27m%20interested%20in%20the%20GST%20SmartCheck%20Pro%20Plan."
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="mt-4 inline-flex rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1fb85a]"
+                >
+                    Get Pro on WhatsApp
+                </a>
+            </article>
+        </div>
+    </div>
+</section>
 
 <div id="successModal" class="fixed inset-0 z-20 hidden items-center justify-center bg-slate-900/60 p-4">
     <div class="w-full max-w-md rounded-2xl bg-white p-6 text-slate-900 shadow-2xl">
