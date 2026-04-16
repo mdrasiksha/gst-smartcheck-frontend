@@ -34,8 +34,8 @@ document.getElementById("uploadForm").addEventListener("submit", async function 
 
         window.location.assign(payload.file_url);
 
-        if (usageCount > 10) {
-            status.innerText = "⚠️ Pro required for additional downloads.";
+        if (usageCount > 5) {
+            status.innerText = "⚠️ You have reached your 5 free invoices.";
             return;
         }
 
