@@ -205,15 +205,6 @@
             ⚠ Always verify extracted data before GST filing/import. OCR fallback activates automatically for low-text PDFs.
         </div>
 
-        <div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
-            <div class="mb-2 flex items-center justify-between">
-                <p class="text-sm font-semibold text-slate-900">Recent Extractions</p>
-                <span id="usageBadge" class="rounded-full bg-[#4169E1]/10 px-3 py-1 text-xs font-semibold text-[#4169E1]">
-                    You have used 0/5 free uploads
-                </span>
-            </div>
-            <p class="text-xs text-slate-600">Track your free quota usage before switching to Pro for unlimited extraction.</p>
-        </div>
     </section>
 </main>
 
@@ -287,7 +278,6 @@
     const submitButtonText = document.getElementById("submitButtonText");
     const submitSpinner = document.getElementById("submitSpinner");
     const statusMessage = document.getElementById("statusMessage");
-    const usageBadge = document.getElementById("usageBadge");
     const usageSummary = document.getElementById("usageSummary");
     const usageBannerMessage = document.getElementById("usageBannerMessage");
     const usageUpgradeButton = document.getElementById("usageUpgradeButton");
@@ -419,13 +409,11 @@
 
         if (plan === "pro") {
             usageSummary.textContent = `Pro Plan: Unlimited / ${PRO_USAGE_CAP}`;
-            usageBadge.textContent = "Pro Plan Active";
             usageBannerMessage.classList.add("hidden");
             usageBannerMessage.textContent = "";
         } else {
             const normalizedUsage = Math.max(0, Math.min(safeUsage, FREE_UPLOAD_LIMIT));
             usageSummary.textContent = `Free Plan: ${normalizedUsage} / ${FREE_UPLOAD_LIMIT} used`;
-            usageBadge.textContent = `You have used ${normalizedUsage}/${FREE_UPLOAD_LIMIT} free uploads`;
 
             if (Number.isFinite(safeRemaining) && safeRemaining === 0) {
                 usageBannerMessage.textContent = "You’ve reached your free limit. Upgrade coming soon.";
