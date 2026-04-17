@@ -73,7 +73,10 @@
         <form id="uploadForm" novalidate class="space-y-5">
             <div>
                 <label for="invoiceFile" id="fileLabel" class="mb-2 block text-sm font-semibold text-slate-700">Choose File</label>
-                <div class="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4">
+                <div id="dropZone" class="rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-4 transition hover:border-[#4169E1]/60 hover:bg-blue-50/50">
+                    <button id="triggerFileButton" type="button" class="mb-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#4169E1] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#4169E1]/25 transition hover:bg-[#3558bd]">
+                        📤 Upload Invoice
+                    </button>
                     <input
                         type="file"
                         id="invoiceFile"
@@ -84,7 +87,7 @@
                         class="w-full cursor-pointer text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-slate-700"
                         aria-describedby="fileHint"
                     >
-                    <p id="fileHint" class="mt-2 text-xs text-slate-500">Supported: PDF, DOC, DOCX, JPG, JPEG, PNG, WEBP, ZIP • Maximum file size: 10MB each</p>
+                    <p id="fileHint" class="mt-2 text-xs text-slate-500">Drag & drop invoice files here, or use the Upload Invoice button. Supported: PDF, DOC, DOCX, JPG, JPEG, PNG, WEBP, ZIP • Maximum file size: 10MB each</p>
                     <ul id="fileList" class="mt-3 space-y-1 text-xs text-slate-600"></ul>
                 </div>
             </div>
@@ -150,8 +153,17 @@
                 class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#4169E1] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#4169E1]/30 transition hover:bg-[#3558bd] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
             >
                 <span id="submitSpinner" class="hidden h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"></span>
-                <span id="submitButtonText">Upload & Convert</span>
+                <span id="submitButtonText">Upload Invoice</span>
             </button>
+            <a
+                id="limitReachedCta"
+                href="https://wa.me/918722250407?text=Hi,%20I%20need%20more%20invoice%20usage%20on%20SmartCheck%20GST."
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hidden w-full items-center justify-center rounded-xl border border-[#25D366]/40 bg-[#25D366]/10 px-4 py-3 text-sm font-semibold text-[#138a43] transition hover:bg-[#25D366]/20"
+            >
+                Need more usage? Contact on WhatsApp
+            </a>
             <div class="mt-2 flex justify-end">
                 <button id="reportIssueButton" type="button" class="text-xs font-normal text-blue-600 transition hover:text-blue-700 hover:underline">
                     Report issue
@@ -160,6 +172,34 @@
         </form>
 
         <p id="statusMessage" class="mt-4 text-sm" role="status" aria-live="polite"></p>
+
+        <div id="extractionResultPanel" class="mt-4 hidden rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+            <p class="text-sm font-semibold text-emerald-800">Latest extraction</p>
+            <div class="mt-2 grid gap-2 text-xs text-emerald-900 sm:grid-cols-2">
+                <p><span class="font-semibold">Invoice No:</span> <span id="resultInvoiceNumber">N/A</span></p>
+                <p><span class="font-semibold">Taxable Amount:</span> <span id="resultTaxableAmount">N/A</span></p>
+                <p><span class="font-semibold">Final Amount:</span> <span id="resultFinalAmount">N/A</span></p>
+                <p><span class="font-semibold">Confidence:</span> <span id="resultConfidence">N/A</span></p>
+            </div>
+        </div>
+
+        <div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <p class="text-sm font-semibold text-slate-900">Need unlimited access?</p>
+            <p class="mt-1 text-xs text-slate-600">Enter your email to get unlimited access</p>
+            <form id="interestForm" class="mt-3 flex flex-col gap-2 sm:flex-row">
+                <input
+                    type="email"
+                    id="interestEmail"
+                    required
+                    class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    placeholder="Enter your email to get unlimited access"
+                >
+                <button type="submit" class="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700">
+                    Notify Me
+                </button>
+            </form>
+            <p id="interestStatus" class="mt-2 text-xs text-slate-600" aria-live="polite"></p>
+        </div>
 
         <div class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
             ⚠ Always verify extracted data before GST filing/import. OCR fallback activates automatically for low-text PDFs.
@@ -233,11 +273,14 @@
     const API_KEY = "free_user_123";
     const uploadEndpoint = `${BASE_URL}/upload`;
     const waitlistLink = "https://wa.me/918722250407?text=Hi,%20I%27m%20interested%20in%20the%20GST%20SmartCheck%20Pro%20Plan.";
+    const collectEmailEndpoint = `${BASE_URL}/collect-email`;
 
     const form = document.getElementById("uploadForm");
     const emailInput = document.getElementById("email");
     const rememberEmailCheckbox = document.getElementById("rememberEmail");
     const fileInput = document.getElementById("invoiceFile");
+    const dropZone = document.getElementById("dropZone");
+    const triggerFileButton = document.getElementById("triggerFileButton");
     const fileList = document.getElementById("fileList");
     const outputFormatInputs = document.querySelectorAll('input[name="outputFormat"]');
     const submitButton = document.getElementById("submitButton");
@@ -248,6 +291,15 @@
     const usageSummary = document.getElementById("usageSummary");
     const usageBannerMessage = document.getElementById("usageBannerMessage");
     const usageUpgradeButton = document.getElementById("usageUpgradeButton");
+    const limitReachedCta = document.getElementById("limitReachedCta");
+    const extractionResultPanel = document.getElementById("extractionResultPanel");
+    const resultInvoiceNumber = document.getElementById("resultInvoiceNumber");
+    const resultTaxableAmount = document.getElementById("resultTaxableAmount");
+    const resultFinalAmount = document.getElementById("resultFinalAmount");
+    const resultConfidence = document.getElementById("resultConfidence");
+    const interestForm = document.getElementById("interestForm");
+    const interestEmail = document.getElementById("interestEmail");
+    const interestStatus = document.getElementById("interestStatus");
     const successModal = document.getElementById("successModal");
     const successModalText = document.getElementById("successModalText");
     const closeSuccessModal = document.getElementById("closeSuccessModal");
@@ -362,26 +414,39 @@
         const safeUsage = Number(usageState.usage) || 0;
         const safeRemaining = Number(usageState.remaining);
         const plan = String(usageState.plan || "free").toLowerCase();
+        const isFreePlan = plan !== "pro";
+        const isLimitReached = isFreePlan && Number.isFinite(safeRemaining) && safeRemaining <= 0;
 
         if (plan === "pro") {
             usageSummary.textContent = `Pro Plan: Unlimited / ${PRO_USAGE_CAP}`;
             usageBadge.textContent = "Pro Plan Active";
             usageBannerMessage.classList.add("hidden");
             usageBannerMessage.textContent = "";
-            return;
-        }
-
-        const normalizedUsage = Math.max(0, Math.min(safeUsage, FREE_UPLOAD_LIMIT));
-        usageSummary.textContent = `Free Plan: ${normalizedUsage} / ${FREE_UPLOAD_LIMIT} used`;
-        usageBadge.textContent = `You have used ${normalizedUsage}/${FREE_UPLOAD_LIMIT} free uploads`;
-
-        if (Number.isFinite(safeRemaining) && safeRemaining <= 2) {
-            usageBannerMessage.textContent = "You are nearing your limit. Upgrade to Pro 🚀";
-            usageBannerMessage.classList.remove("hidden");
         } else {
-            usageBannerMessage.classList.add("hidden");
-            usageBannerMessage.textContent = "";
+            const normalizedUsage = Math.max(0, Math.min(safeUsage, FREE_UPLOAD_LIMIT));
+            usageSummary.textContent = `Free Plan: ${normalizedUsage} / ${FREE_UPLOAD_LIMIT} used`;
+            usageBadge.textContent = `You have used ${normalizedUsage}/${FREE_UPLOAD_LIMIT} free uploads`;
+
+            if (Number.isFinite(safeRemaining) && safeRemaining === 0) {
+                usageBannerMessage.textContent = "You’ve reached your free limit. Upgrade coming soon.";
+                usageBannerMessage.classList.remove("hidden");
+            } else if (Number.isFinite(safeRemaining) && safeRemaining <= 3) {
+                usageBannerMessage.textContent = "You are nearing your free limit 🚀";
+                usageBannerMessage.classList.remove("hidden");
+            } else {
+                usageBannerMessage.classList.add("hidden");
+                usageBannerMessage.textContent = "";
+            }
         }
+
+        submitButton.disabled = isLimitReached;
+        fileInput.disabled = isLimitReached;
+        triggerFileButton.disabled = isLimitReached;
+        triggerFileButton.classList.toggle("opacity-60", isLimitReached);
+        triggerFileButton.classList.toggle("cursor-not-allowed", isLimitReached);
+        limitReachedCta.classList.toggle("hidden", !isLimitReached);
+        limitReachedCta.classList.toggle("inline-flex", isLimitReached);
+        submitButtonText.textContent = isLimitReached ? "Free Limit Reached" : getSubmitButtonLabel();
     };
 
     const syncUsageState = ({ usage, remaining, plan }) => {
@@ -466,9 +531,27 @@
     };
 
     const setLoadingState = (isLoading, label = getSubmitButtonLabel()) => {
-        submitButton.disabled = isLoading;
+        const hardDisabled = usageState.plan !== "pro" && Number(usageState.remaining) <= 0;
+        submitButton.disabled = isLoading || hardDisabled;
         submitButtonText.textContent = isLoading ? label : getSubmitButtonLabel();
         submitSpinner.classList.toggle("hidden", !isLoading);
+    };
+
+    const renderExtractionResult = (result) => {
+        if (!result) {
+            extractionResultPanel.classList.add("hidden");
+            return;
+        }
+
+        const confidenceScore = result?.confidence_score ?? result?.confidence ?? result?.score;
+        resultInvoiceNumber.textContent = readValue(result?.invoice_number || result?.invoiceNumber || result?.invoice_no);
+        resultTaxableAmount.textContent = readValue(result?.taxable_amount || result?.taxableAmount || result?.taxable_value);
+        resultFinalAmount.textContent = readValue(result?.final_amount || result?.finalAmount || result?.total_amount);
+        resultConfidence.textContent = confidenceScore === null || confidenceScore === undefined || confidenceScore === ""
+            ? "N/A"
+            : `${confidenceScore}`;
+
+        extractionResultPanel.classList.remove("hidden");
     };
 
     const isSupportedFile = (file) => {
@@ -573,6 +656,36 @@
 
     outputFormatInputs.forEach((input) => input.addEventListener("change", () => setLoadingState(false)));
     fileInput.addEventListener("change", renderSelectedFiles);
+    triggerFileButton.addEventListener("click", () => {
+        if (!triggerFileButton.disabled) {
+            fileInput.click();
+        }
+    });
+    ["dragenter", "dragover"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dropZone.classList.add("border-[#4169E1]", "bg-blue-50");
+        });
+    });
+    ["dragleave", "drop"].forEach((eventName) => {
+        dropZone.addEventListener(eventName, (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            dropZone.classList.remove("border-[#4169E1]", "bg-blue-50");
+        });
+    });
+    dropZone.addEventListener("drop", (event) => {
+        if (triggerFileButton.disabled) {
+            return;
+        }
+        const droppedFiles = event.dataTransfer?.files;
+        if (!droppedFiles?.length) {
+            return;
+        }
+        fileInput.files = droppedFiles;
+        renderSelectedFiles();
+    });
     rememberEmailCheckbox.addEventListener("change", handleRememberedEmailState);
     emailInput.addEventListener("input", handleRememberedEmailState);
     loadRememberedEmail();
@@ -626,6 +739,7 @@
                             finalAmount: readValue(result?.final_amount || result?.finalAmount || result?.total_amount),
                             validationStatus: readValue(result?.validation_status || result?.validationStatus || "Unknown", "Unknown")
                         };
+                        renderExtractionResult(result);
                         const filename = result?.file_url?.split("/").pop();
                         if (!filename) {
                             throw new Error(`Missing download URL for ${file.name}.`);
@@ -734,6 +848,48 @@
     usageUpgradeButton.addEventListener("click", (event) => {
         event.preventDefault();
         openWaitlist();
+    });
+    interestForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        if (!interestEmail.checkValidity()) {
+            interestStatus.textContent = "Please enter a valid email address.";
+            interestStatus.className = "mt-2 text-xs text-red-600";
+            interestEmail.focus();
+            return;
+        }
+
+        interestStatus.textContent = "Saving your request...";
+        interestStatus.className = "mt-2 text-xs text-slate-600";
+
+        try {
+            const response = await fetch(collectEmailEndpoint, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "x-api-key": API_KEY
+                },
+                body: JSON.stringify({ email: interestEmail.value.trim() })
+            });
+
+            if (!response.ok) {
+                let errorText = "Could not save your email right now.";
+                try {
+                    const errorPayload = await response.json();
+                    errorText = errorPayload.error || errorText;
+                } catch {
+                    // ignore parse errors
+                }
+                throw new Error(errorText);
+            }
+
+            interestStatus.textContent = "Thanks! We’ll notify you when unlimited access is live.";
+            interestStatus.className = "mt-2 text-xs text-emerald-700";
+            interestForm.reset();
+        } catch (error) {
+            interestStatus.textContent = error.message || "Could not save your email right now.";
+            interestStatus.className = "mt-2 text-xs text-red-600";
+        }
     });
 
     updateUsageDisplay();
