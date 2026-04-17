@@ -128,6 +128,22 @@
                 <p id="emailHint" class="mt-2 text-xs text-slate-500">We only use this for upload tracking and support communication.</p>
             </div>
 
+            <div id="usagePanel" class="rounded-xl border border-blue-100 bg-blue-50 p-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <p id="usageSummary" class="text-sm font-semibold text-blue-900">Free Plan: 0 / 10 used</p>
+                    <a
+                        id="usageUpgradeButton"
+                        href="https://wa.me/918722250407?text=Hi,%20I%27m%20interested%20in%20the%20GST%20SmartCheck%20Pro%20Plan."
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center rounded-lg bg-[#25D366] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#1fb85a]"
+                    >
+                        Upgrade Now
+                    </a>
+                </div>
+                <p id="usageBannerMessage" class="mt-2 hidden text-xs font-medium text-amber-700"></p>
+            </div>
+
             <button
                 id="submitButton"
                 type="submit"
@@ -211,8 +227,10 @@
         "multipart/x-zip",
         "application/x-compressed"
     ]);
-    const FREE_UPLOAD_LIMIT = 5;
+    const FREE_UPLOAD_LIMIT = 10;
+    const PRO_USAGE_CAP = 1000;
     const BASE_URL = "https://gst-smartcheck-docker.onrender.com";
+    const API_KEY = "free_user_123";
     const uploadEndpoint = `${BASE_URL}/upload`;
     const waitlistLink = "https://wa.me/918722250407?text=Hi,%20I%27m%20interested%20in%20the%20GST%20SmartCheck%20Pro%20Plan.";
 
@@ -227,6 +245,9 @@
     const submitSpinner = document.getElementById("submitSpinner");
     const statusMessage = document.getElementById("statusMessage");
     const usageBadge = document.getElementById("usageBadge");
+    const usageSummary = document.getElementById("usageSummary");
+    const usageBannerMessage = document.getElementById("usageBannerMessage");
+    const usageUpgradeButton = document.getElementById("usageUpgradeButton");
     const successModal = document.getElementById("successModal");
     const successModalText = document.getElementById("successModalText");
     const closeSuccessModal = document.getElementById("closeSuccessModal");
@@ -241,7 +262,11 @@
     const limitWhatsappButton = document.getElementById("limitWhatsappButton");
     const closeLimitModalButton = document.getElementById("closeLimitModalButton");
 
-    let usedFreeUploads = 0;
+    let usageState = {
+        usage: 0,
+        remaining: FREE_UPLOAD_LIMIT,
+        plan: "free"
+    };
     let latestExtraction = {
         invoiceNumber: "N/A",
         taxableAmount: "N/A",
@@ -333,17 +358,44 @@
         tallyLockedMessage.classList.add("hidden");
     };
 
-    const updateUsageBadge = () => {
-        usageBadge.textContent = `You have used ${Math.min(usedFreeUploads, FREE_UPLOAD_LIMIT)}/${FREE_UPLOAD_LIMIT} free uploads`;
-    };
+    const updateUsageDisplay = () => {
+        const safeUsage = Number(usageState.usage) || 0;
+        const safeRemaining = Number(usageState.remaining);
+        const plan = String(usageState.plan || "free").toLowerCase();
 
-    const syncUsageFromRemaining = (remaining) => {
-        if (remaining === null || remaining === undefined || Number.isNaN(Number(remaining))) {
+        if (plan === "pro") {
+            usageSummary.textContent = `Pro Plan: Unlimited / ${PRO_USAGE_CAP}`;
+            usageBadge.textContent = "Pro Plan Active";
+            usageBannerMessage.classList.add("hidden");
+            usageBannerMessage.textContent = "";
             return;
         }
 
-        usedFreeUploads = FREE_UPLOAD_LIMIT - Number(remaining);
-        updateUsageBadge();
+        const normalizedUsage = Math.max(0, Math.min(safeUsage, FREE_UPLOAD_LIMIT));
+        usageSummary.textContent = `Free Plan: ${normalizedUsage} / ${FREE_UPLOAD_LIMIT} used`;
+        usageBadge.textContent = `You have used ${normalizedUsage}/${FREE_UPLOAD_LIMIT} free uploads`;
+
+        if (Number.isFinite(safeRemaining) && safeRemaining <= 2) {
+            usageBannerMessage.textContent = "You are nearing your limit. Upgrade to Pro 🚀";
+            usageBannerMessage.classList.remove("hidden");
+        } else {
+            usageBannerMessage.classList.add("hidden");
+            usageBannerMessage.textContent = "";
+        }
+    };
+
+    const syncUsageState = ({ usage, remaining, plan }) => {
+        if (usage !== null && usage !== undefined && !Number.isNaN(Number(usage))) {
+            usageState.usage = Number(usage);
+        }
+        if (remaining !== null && remaining !== undefined && !Number.isNaN(Number(remaining))) {
+            usageState.remaining = Number(remaining);
+        }
+        if (plan) {
+            usageState.plan = String(plan).toLowerCase();
+        }
+
+        updateUsageDisplay();
     };
 
     const openSuccessModal = (message, isVerified) => {
@@ -484,27 +536,39 @@
 
         const response = await fetch(uploadEndpoint, {
             method: "POST",
+            headers: {
+                "x-api-key": API_KEY
+            },
             body: formData
         });
 
         if (!response.ok) {
             let message = `Upload failed for ${file.name}.`;
             let action = null;
+            let usage = null;
+            let remaining = null;
+            let plan = null;
             try {
                 const errorData = await response.json();
                 message = errorData.error || message;
                 action = errorData.action || null;
+                usage = errorData.usage;
+                remaining = errorData.remaining;
+                plan = errorData.plan;
             } catch {
                 // Non-JSON error response fallback
             }
             const error = new Error(message);
             error.code = response.status;
             error.action = action;
-            error.remaining = response.headers.get("X-Remaining");
+            error.usage = usage;
+            error.remaining = remaining;
+            error.plan = plan;
             throw error;
         }
 
-        return response;
+        const payload = await response.json();
+        return { payload, response };
     };
 
     outputFormatInputs.forEach((input) => input.addEventListener("change", () => setLoadingState(false)));
@@ -532,7 +596,6 @@
         setStatus(`Uploading invoice and preparing ${outputLabel} output...`, "info");
 
         try {
-            let remaining = null;
             let successCount = 0;
             const failedFiles = [];
             let checksumPassed = false;
@@ -543,18 +606,20 @@
                 setLoadingState(true, `Processing ${index + 1}/${files.length}...`);
 
                 try {
-                    const response = await uploadSingleFile(email, file, outputFormat);
-                    remaining = response.headers.get("X-Remaining") || remaining;
+                    const { payload, response } = await uploadSingleFile(email, file, outputFormat);
+                    const result = payload?.data || payload;
+                    syncUsageState({
+                        usage: payload?.usage,
+                        remaining: payload?.remaining,
+                        plan: payload?.plan
+                    });
                     checksumPassed = checksumPassed || response.headers.get("X-GSTIN-Checksum") === "pass";
-                    const contentType = (response.headers.get("Content-Type") || "").toLowerCase();
 
-                    if (contentType.includes("xml")) {
-                        const xmlBlob = await response.blob();
-                        const baseFilename = file.name.replace(/\.pdf$/i, "") || "invoice";
-                        const filename = getDownloadFilename(response, `${baseFilename}.xml`);
-                        downloadBlob(xmlBlob, filename);
+                    if (outputFormat === "xml" && result?.xml_content) {
+                        const xmlBlob = new Blob([result.xml_content], { type: "application/xml" });
+                        const xmlFilename = `${(file.name || "invoice").replace(/\.[^.]+$/i, "")}.xml`;
+                        downloadBlob(xmlBlob, xmlFilename);
                     } else {
-                        const result = await response.json();
                         latestExtraction = {
                             invoiceNumber: readValue(result?.invoice_number || result?.invoiceNumber || result?.invoice_no),
                             taxableAmount: readValue(result?.taxable_amount || result?.taxableAmount || result?.taxable_value),
@@ -578,9 +643,9 @@
                 }
             }
 
-            syncUsageFromRemaining(remaining);
-
-            const remainingMessage = remaining ? ` Free uploads remaining: ${remaining}.` : "";
+            const remainingMessage = Number.isFinite(usageState.remaining)
+                ? ` Free uploads remaining: ${usageState.remaining}.`
+                : "";
 
             if (failedFiles.length === 0) {
                 const completionMessage = `✅ Conversion complete. Your ${outputLabel} file is downloading.${remainingMessage}`;
@@ -606,11 +671,14 @@
             renderSelectedFiles();
         } catch (error) {
             const errorMessage = error.message || "Backend not reachable.";
-            syncUsageFromRemaining(error.remaining);
+            syncUsageState({
+                usage: error.usage,
+                remaining: error.remaining,
+                plan: error.plan
+            });
             setStatus(`❌ ${errorMessage}`, "error");
 
-            const isLimitReached =
-                Number.isFinite(usedFreeUploads) && usedFreeUploads >= FREE_UPLOAD_LIMIT;
+            const isLimitReached = usageState.plan !== "pro" && Number(usageState.remaining) <= 0;
             const shouldPromptUpgrade =
                 error.code === 403 ||
                 error.action === "upgrade" ||
@@ -618,6 +686,9 @@
                 /limit reached|quota|free uploads/i.test(errorMessage);
 
             if (shouldPromptUpgrade) {
+                if (error.code === 403) {
+                    setStatus("❌ Free limit reached. Upgrade to continue.", "error");
+                }
                 openLimitReachedModal();
             }
         } finally {
@@ -660,8 +731,12 @@
             closeLimitReachedModal();
         }
     });
+    usageUpgradeButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        openWaitlist();
+    });
 
-    updateUsageBadge();
+    updateUsageDisplay();
     setTallyButtonLockedState();
 })();
 </script>
