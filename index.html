@@ -72,7 +72,7 @@
 
         <form id="uploadForm" novalidate class="space-y-5">
             <div>
-                <label for="invoiceFile" id="fileLabel" class="mb-2 block text-sm font-semibold text-slate-700">Upload Invoice</label>
+                <label for="invoiceFile" id="fileLabel" class="mb-2 block text-sm font-semibold text-slate-700">Choose File</label>
                 <div id="dropZone" class="rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-4 transition hover:border-[#4169E1]/60 hover:bg-blue-50/50">
                     <button id="triggerFileButton" type="button" class="mb-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#4169E1] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#4169E1]/25 transition hover:bg-[#3558bd]">
                         📤 Upload Invoice
@@ -84,7 +84,7 @@
                         accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp,.zip,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png,image/webp,application/zip,application/x-zip-compressed,multipart/x-zip,application/x-compressed"
                         multiple
                         required
-                        class="sr-only"
+                        class="w-full cursor-pointer text-sm text-slate-600 file:mr-4 file:rounded-lg file:border-0 file:bg-slate-900 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-slate-700"
                         aria-describedby="fileHint"
                     >
                     <p id="fileHint" class="mt-2 text-xs text-slate-500">Drag & drop invoice files here, or use the Upload Invoice button. Supported: PDF, DOC, DOCX, JPG, JPEG, PNG, WEBP, ZIP • Maximum file size: 10MB each</p>
