@@ -173,16 +173,6 @@
 
         <p id="statusMessage" class="mt-4 text-sm" role="status" aria-live="polite"></p>
 
-        <div id="extractionResultPanel" class="mt-4 hidden rounded-xl border border-emerald-100 bg-emerald-50 p-4">
-            <p class="text-sm font-semibold text-emerald-800">Latest extraction</p>
-            <div class="mt-2 grid gap-2 text-xs text-emerald-900 sm:grid-cols-2">
-                <p><span class="font-semibold">Invoice No:</span> <span id="resultInvoiceNumber">N/A</span></p>
-                <p><span class="font-semibold">Taxable Amount:</span> <span id="resultTaxableAmount">N/A</span></p>
-                <p><span class="font-semibold">Final Amount:</span> <span id="resultFinalAmount">N/A</span></p>
-                <p><span class="font-semibold">Confidence:</span> <span id="resultConfidence">N/A</span></p>
-            </div>
-        </div>
-
         <div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p class="text-sm font-semibold text-slate-900">Need unlimited access?</p>
             <p class="mt-1 text-xs text-slate-600">Enter your email to get unlimited access</p>
@@ -283,11 +273,6 @@
     const usageBannerMessage = document.getElementById("usageBannerMessage");
     const usageUpgradeButton = document.getElementById("usageUpgradeButton");
     const limitReachedCta = document.getElementById("limitReachedCta");
-    const extractionResultPanel = document.getElementById("extractionResultPanel");
-    const resultInvoiceNumber = document.getElementById("resultInvoiceNumber");
-    const resultTaxableAmount = document.getElementById("resultTaxableAmount");
-    const resultFinalAmount = document.getElementById("resultFinalAmount");
-    const resultConfidence = document.getElementById("resultConfidence");
     const interestForm = document.getElementById("interestForm");
     const interestEmail = document.getElementById("interestEmail");
     const notifyButton = document.getElementById("notifyButton");
@@ -527,23 +512,6 @@
         submitSpinner.classList.toggle("hidden", !isLoading);
     };
 
-    const renderExtractionResult = (result) => {
-        if (!result) {
-            extractionResultPanel.classList.add("hidden");
-            return;
-        }
-
-        const confidenceScore = result?.confidence_score ?? result?.confidence ?? result?.score;
-        resultInvoiceNumber.textContent = readValue(result?.invoice_number || result?.invoiceNumber || result?.invoice_no);
-        resultTaxableAmount.textContent = readValue(result?.taxable_amount || result?.taxableAmount || result?.taxable_value);
-        resultFinalAmount.textContent = readValue(result?.final_amount || result?.finalAmount || result?.total_amount);
-        resultConfidence.textContent = confidenceScore === null || confidenceScore === undefined || confidenceScore === ""
-            ? "N/A"
-            : `${confidenceScore}`;
-
-        extractionResultPanel.classList.remove("hidden");
-    };
-
     const isSupportedFile = (file) => {
         const fileName = (file.name || "").toLowerCase();
         const fileType = (file.type || "").toLowerCase();
@@ -729,7 +697,6 @@
                             finalAmount: readValue(result?.final_amount || result?.finalAmount || result?.total_amount),
                             validationStatus: readValue(result?.validation_status || result?.validationStatus || "Unknown", "Unknown")
                         };
-                        renderExtractionResult(result);
                         const filename = result?.file_url?.split("/").pop();
                         if (!filename) {
                             throw new Error(`Missing download URL for ${file.name}.`);
