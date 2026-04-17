@@ -26,8 +26,42 @@
     </nav>
 </header>
 
-<main class="mx-auto flex min-h-screen w-full max-w-2xl items-center justify-center p-4 py-10">
-    <section class="w-full rounded-3xl border border-white/15 bg-white p-8 text-slate-900 shadow-2xl">
+<main class="mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center gap-8 p-4 py-10 lg:flex-row lg:items-stretch lg:gap-10">
+    <section class="rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-2xl backdrop-blur lg:w-1/2">
+        <span class="inline-flex items-center rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-cyan-300">
+            SmartCheck GST
+        </span>
+
+        <h1 class="mt-5 text-3xl font-bold leading-tight text-white sm:text-4xl">
+            Convert GST invoices to Excel or Tally XML in seconds.
+        </h1>
+
+        <p class="mt-4 text-base leading-7 text-slate-300">
+            Upload a PDF invoice and get structured outputs ready for review, reconciliation, filing, and Tally import.
+            Built for finance teams, CAs, and GST operators who need speed with confidence.
+        </p>
+
+        <div class="mt-8 grid gap-4 sm:grid-cols-2">
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-sm font-semibold text-white">⚡ Faster processing</p>
+                <p class="mt-1 text-sm text-slate-300">Automated extraction replaces repetitive manual entry.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-sm font-semibold text-white">🔒 Supabase-backed security</p>
+                <p class="mt-1 text-sm text-slate-300">Uploads are handled through secure Supabase storage workflows.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-sm font-semibold text-white">✅ GSTIN checksum guardrails</p>
+                <p class="mt-1 text-sm text-slate-300">GSTIN values are accepted only when Mod-36 checksum validation passes.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-sm font-semibold text-white">🎁 Free beta quota</p>
+                <p class="mt-1 text-sm text-slate-300">Get 5 free uploads while the product is in beta.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="rounded-3xl border border-white/15 bg-white p-8 text-slate-900 shadow-2xl lg:w-1/2">
         <div class="mb-6 flex items-center justify-between gap-4">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#4169E1]">Invoice Converter</p>
@@ -139,6 +173,16 @@
 
         <p id="statusMessage" class="mt-4 text-sm" role="status" aria-live="polite"></p>
 
+        <div id="extractionResultPanel" class="mt-4 hidden rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+            <p class="text-sm font-semibold text-emerald-800">Latest extraction</p>
+            <div class="mt-2 grid gap-2 text-xs text-emerald-900 sm:grid-cols-2">
+                <p><span class="font-semibold">Invoice No:</span> <span id="resultInvoiceNumber">N/A</span></p>
+                <p><span class="font-semibold">Taxable Amount:</span> <span id="resultTaxableAmount">N/A</span></p>
+                <p><span class="font-semibold">Final Amount:</span> <span id="resultFinalAmount">N/A</span></p>
+                <p><span class="font-semibold">Confidence:</span> <span id="resultConfidence">N/A</span></p>
+            </div>
+        </div>
+
         <div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p class="text-sm font-semibold text-slate-900">Need unlimited access?</p>
             <p class="mt-1 text-xs text-slate-600">Enter your email to get unlimited access</p>
@@ -155,6 +199,20 @@
                 </button>
             </form>
             <p id="interestStatus" class="mt-2 text-xs text-slate-600" aria-live="polite"></p>
+        </div>
+
+        <div class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
+            ⚠ Always verify extracted data before GST filing/import. OCR fallback activates automatically for low-text PDFs.
+        </div>
+
+        <div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <div class="mb-2 flex items-center justify-between">
+                <p class="text-sm font-semibold text-slate-900">Recent Extractions</p>
+                <span id="usageBadge" class="rounded-full bg-[#4169E1]/10 px-3 py-1 text-xs font-semibold text-[#4169E1]">
+                    You have used 0/5 free uploads
+                </span>
+            </div>
+            <p class="text-xs text-slate-600">Track your free quota usage before switching to Pro for unlimited extraction.</p>
         </div>
     </section>
 </main>
@@ -229,10 +287,16 @@
     const submitButtonText = document.getElementById("submitButtonText");
     const submitSpinner = document.getElementById("submitSpinner");
     const statusMessage = document.getElementById("statusMessage");
+    const usageBadge = document.getElementById("usageBadge");
     const usageSummary = document.getElementById("usageSummary");
     const usageBannerMessage = document.getElementById("usageBannerMessage");
     const usageUpgradeButton = document.getElementById("usageUpgradeButton");
     const limitReachedCta = document.getElementById("limitReachedCta");
+    const extractionResultPanel = document.getElementById("extractionResultPanel");
+    const resultInvoiceNumber = document.getElementById("resultInvoiceNumber");
+    const resultTaxableAmount = document.getElementById("resultTaxableAmount");
+    const resultFinalAmount = document.getElementById("resultFinalAmount");
+    const resultConfidence = document.getElementById("resultConfidence");
     const interestForm = document.getElementById("interestForm");
     const interestEmail = document.getElementById("interestEmail");
     const interestStatus = document.getElementById("interestStatus");
@@ -255,6 +319,13 @@
         remaining: FREE_UPLOAD_LIMIT,
         plan: "free"
     };
+    let latestExtraction = {
+        invoiceNumber: "N/A",
+        taxableAmount: "N/A",
+        finalAmount: "N/A",
+        validationStatus: "Unknown"
+    };
+
     const openWaitlist = () => {
         window.open(waitlistLink, "_blank", "noopener,noreferrer");
     };
@@ -272,10 +343,10 @@
         const uiFinalAmount = document.getElementById("finalAmount")?.textContent?.trim();
         const uiValidationStatus = document.getElementById("validationStatus")?.textContent?.trim();
 
-        const invoiceNumber = readValue(uiInvoiceNumber);
-        const taxableAmount = readValue(uiTaxableAmount);
-        const finalAmount = readValue(uiFinalAmount);
-        const validationStatus = readValue(uiValidationStatus, "Unknown");
+        const invoiceNumber = readValue(uiInvoiceNumber || latestExtraction.invoiceNumber);
+        const taxableAmount = readValue(uiTaxableAmount || latestExtraction.taxableAmount);
+        const finalAmount = readValue(uiFinalAmount || latestExtraction.finalAmount);
+        const validationStatus = readValue(uiValidationStatus || latestExtraction.validationStatus, "Unknown");
 
         const message = `Hi, I found an issue with Invoice #${invoiceNumber}. Tool extracted taxable ${taxableAmount} and final ${finalAmount} but it looks wrong. Status: ${validationStatus}. Please help!`;
         const whatsappUrl = `https://wa.me/918722250407?text=${encodeURIComponent(message)}`;
@@ -348,11 +419,13 @@
 
         if (plan === "pro") {
             usageSummary.textContent = `Pro Plan: Unlimited / ${PRO_USAGE_CAP}`;
+            usageBadge.textContent = "Pro Plan Active";
             usageBannerMessage.classList.add("hidden");
             usageBannerMessage.textContent = "";
         } else {
             const normalizedUsage = Math.max(0, Math.min(safeUsage, FREE_UPLOAD_LIMIT));
             usageSummary.textContent = `Free Plan: ${normalizedUsage} / ${FREE_UPLOAD_LIMIT} used`;
+            usageBadge.textContent = `You have used ${normalizedUsage}/${FREE_UPLOAD_LIMIT} free uploads`;
 
             if (Number.isFinite(safeRemaining) && safeRemaining === 0) {
                 usageBannerMessage.textContent = "You’ve reached your free limit. Upgrade coming soon.";
@@ -462,6 +535,23 @@
         submitButton.disabled = isLoading || hardDisabled;
         submitButtonText.textContent = isLoading ? label : getSubmitButtonLabel();
         submitSpinner.classList.toggle("hidden", !isLoading);
+    };
+
+    const renderExtractionResult = (result) => {
+        if (!result) {
+            extractionResultPanel.classList.add("hidden");
+            return;
+        }
+
+        const confidenceScore = result?.confidence_score ?? result?.confidence ?? result?.score;
+        resultInvoiceNumber.textContent = readValue(result?.invoice_number || result?.invoiceNumber || result?.invoice_no);
+        resultTaxableAmount.textContent = readValue(result?.taxable_amount || result?.taxableAmount || result?.taxable_value);
+        resultFinalAmount.textContent = readValue(result?.final_amount || result?.finalAmount || result?.total_amount);
+        resultConfidence.textContent = confidenceScore === null || confidenceScore === undefined || confidenceScore === ""
+            ? "N/A"
+            : `${confidenceScore}`;
+
+        extractionResultPanel.classList.remove("hidden");
     };
 
     const isSupportedFile = (file) => {
@@ -643,6 +733,13 @@
                         const xmlFilename = `${(file.name || "invoice").replace(/\.[^.]+$/i, "")}.xml`;
                         downloadBlob(xmlBlob, xmlFilename);
                     } else {
+                        latestExtraction = {
+                            invoiceNumber: readValue(result?.invoice_number || result?.invoiceNumber || result?.invoice_no),
+                            taxableAmount: readValue(result?.taxable_amount || result?.taxableAmount || result?.taxable_value),
+                            finalAmount: readValue(result?.final_amount || result?.finalAmount || result?.total_amount),
+                            validationStatus: readValue(result?.validation_status || result?.validationStatus || "Unknown", "Unknown")
+                        };
+                        renderExtractionResult(result);
                         const filename = result?.file_url?.split("/").pop();
                         if (!filename) {
                             throw new Error(`Missing download URL for ${file.name}.`);
