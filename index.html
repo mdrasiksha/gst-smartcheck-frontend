@@ -194,7 +194,7 @@
                     class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
                     placeholder="Enter your email to get unlimited access"
                 >
-                <button type="submit" class="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700">
+                <button id="notifyButton" type="submit" class="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500">
                     Notify Me
                 </button>
             </form>
@@ -261,10 +261,11 @@
     const FREE_UPLOAD_LIMIT = 10;
     const PRO_USAGE_CAP = 1000;
     const BASE_URL = "https://gst-smartcheck-docker.onrender.com";
+    const API_URL = BASE_URL;
     const API_KEY = "free_user_123";
-    const uploadEndpoint = `${BASE_URL}/upload`;
+    const uploadEndpoint = `${API_URL}/upload`;
     const waitlistLink = "https://wa.me/918722250407?text=Hi,%20I%27m%20interested%20in%20the%20GST%20SmartCheck%20Pro%20Plan.";
-    const collectEmailEndpoint = `${BASE_URL}/collect-email`;
+    const collectEmailEndpoint = `${API_URL}/collect-email`;
 
     const form = document.getElementById("uploadForm");
     const emailInput = document.getElementById("email");
@@ -289,6 +290,7 @@
     const resultConfidence = document.getElementById("resultConfidence");
     const interestForm = document.getElementById("interestForm");
     const interestEmail = document.getElementById("interestEmail");
+    const notifyButton = document.getElementById("notifyButton");
     const interestStatus = document.getElementById("interestStatus");
     const successModal = document.getElementById("successModal");
     const successModalText = document.getElementById("successModalText");
@@ -837,27 +839,43 @@
         event.preventDefault();
         openWaitlist();
     });
-    interestForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
+    const setInterestStatus = (message, tone = "info") => {
+        const toneClasses = {
+            info: "mt-2 text-xs text-slate-600",
+            success: "mt-2 text-xs text-emerald-700",
+            error: "mt-2 text-xs text-red-600"
+        };
 
-        if (!interestEmail.checkValidity()) {
-            interestStatus.textContent = "Please enter a valid email address.";
-            interestStatus.className = "mt-2 text-xs text-red-600";
+        interestStatus.textContent = message;
+        interestStatus.className = toneClasses[tone] || toneClasses.info;
+    };
+
+    const syncNotifyButtonState = () => {
+        notifyButton.disabled = !interestEmail.value.trim();
+    };
+
+    const handleEmailSubmit = async () => {
+        const email = interestEmail.value.trim();
+
+        if (!email.includes("@")) {
+            setInterestStatus("Please enter a valid email address.", "error");
             interestEmail.focus();
             return;
         }
 
-        interestStatus.textContent = "Saving your request...";
-        interestStatus.className = "mt-2 text-xs text-slate-600";
+        notifyButton.disabled = true;
+        setInterestStatus("Saving your request...", "info");
 
         try {
             const response = await fetch(collectEmailEndpoint, {
                 method: "POST",
                 headers: {
-                    "Content-Type": "application/json",
+                    "Content-Type": "application/x-www-form-urlencoded",
                     "x-api-key": API_KEY
                 },
-                body: JSON.stringify({ email: interestEmail.value.trim() })
+                body: new URLSearchParams({
+                    email
+                })
             });
 
             if (!response.ok) {
@@ -871,17 +889,24 @@
                 throw new Error(errorText);
             }
 
-            interestStatus.textContent = "Thanks! We’ll notify you when unlimited access is live.";
-            interestStatus.className = "mt-2 text-xs text-emerald-700";
-            interestForm.reset();
+            setInterestStatus("Thanks! We’ll notify you 🚀 ✔ Email saved", "success");
+            interestEmail.value = "";
         } catch (error) {
-            interestStatus.textContent = error.message || "Could not save your email right now.";
-            interestStatus.className = "mt-2 text-xs text-red-600";
+            setInterestStatus(error.message || "Could not save your email right now.", "error");
+        } finally {
+            syncNotifyButtonState();
         }
+    };
+
+    interestEmail.addEventListener("input", syncNotifyButtonState);
+    interestForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        await handleEmailSubmit();
     });
 
     updateUsageDisplay();
     setTallyButtonLockedState();
+    syncNotifyButtonState();
 })();
 </script>
 
