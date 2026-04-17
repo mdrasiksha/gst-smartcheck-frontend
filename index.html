@@ -130,11 +130,6 @@
             >
                 Need more usage? Contact on WhatsApp
             </a>
-            <div class="mt-2 flex justify-end">
-                <button id="reportIssueButton" type="button" class="text-xs font-normal text-blue-600 transition hover:text-blue-700 hover:underline">
-                    Report issue
-                </button>
-            </div>
         </form>
 
         <p id="statusMessage" class="mt-4 text-sm" role="status" aria-live="polite"></p>
@@ -245,7 +240,6 @@
     const modalGetProButton = document.getElementById("modalGetProButton");
     const tallyLockedButton = document.getElementById("tallyLockedButton");
     const tallyLockedMessage = document.getElementById("tallyLockedMessage");
-    const reportIssueButton = document.getElementById("reportIssueButton");
     const limitReachedModal = document.getElementById("limitReachedModal");
     const limitWhatsappButton = document.getElementById("limitWhatsappButton");
     const closeLimitModalButton = document.getElementById("closeLimitModalButton");
@@ -257,29 +251,6 @@
     };
     const openWaitlist = () => {
         window.open(waitlistLink, "_blank", "noopener,noreferrer");
-    };
-
-    const readValue = (value, fallback = "N/A") => {
-        if (value === null || value === undefined || value === "") {
-            return fallback;
-        }
-        return value;
-    };
-
-    const reportToWhatsApp = () => {
-        const uiInvoiceNumber = document.getElementById("invoiceNumber")?.textContent?.trim();
-        const uiTaxableAmount = document.getElementById("taxableAmount")?.textContent?.trim();
-        const uiFinalAmount = document.getElementById("finalAmount")?.textContent?.trim();
-        const uiValidationStatus = document.getElementById("validationStatus")?.textContent?.trim();
-
-        const invoiceNumber = readValue(uiInvoiceNumber);
-        const taxableAmount = readValue(uiTaxableAmount);
-        const finalAmount = readValue(uiFinalAmount);
-        const validationStatus = readValue(uiValidationStatus, "Unknown");
-
-        const message = `Hi, I found an issue with Invoice #${invoiceNumber}. Tool extracted taxable ${taxableAmount} and final ${finalAmount} but it looks wrong. Status: ${validationStatus}. Please help!`;
-        const whatsappUrl = `https://wa.me/918722250407?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, "_blank", "noopener,noreferrer");
     };
 
     const downloadBlob = (blob, filename) => {
@@ -733,7 +704,6 @@
             setStatus(`❌ ${error.message || "Unable to download Tally XML."}`, "error");
         }
     });
-    reportIssueButton.addEventListener("click", reportToWhatsApp);
     closeSuccessModal.addEventListener("click", closeModal);
     modalDoneButton.addEventListener("click", closeModal);
     successModal.addEventListener("click", (event) => {
