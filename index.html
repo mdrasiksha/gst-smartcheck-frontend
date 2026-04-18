@@ -7,326 +7,826 @@
     <title>SmartCheck GST | Invoice PDF to Excel</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<div class="min-h-screen w-full bg-gradient-to-r from-blue-900 to-teal-700 text-white">
-    <header class="sticky top-0 z-20 w-full flex justify-between items-center px-6 py-4 bg-white/10 backdrop-blur-md border-b border-white/20">
-        <p class="text-base font-semibold tracking-wide">SmartCheck GST</p>
+
+<body class="min-h-screen bg-slate-950 text-slate-100">
+<div class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,#1e3a8a,transparent_55%),radial-gradient(circle_at_80%_20%,#0f766e,transparent_40%),radial-gradient(circle_at_20%_80%,#4f46e5,transparent_45%)] opacity-60"></div>
+
+<header class="mx-auto w-full max-w-6xl px-4 pt-6">
+    <nav class="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 shadow-lg backdrop-blur">
+        <p class="text-sm font-semibold tracking-wide text-slate-100">SmartCheck GST</p>
         <a
             id="navGetProButton"
             href="https://wa.me/918722250407?text=Hi,%20I%27m%20interested%20in%20the%20GST%20SmartCheck%20Pro%20Plan."
             target="_blank"
             rel="noopener noreferrer"
-            class="rounded-lg bg-white text-blue-800 px-4 py-2 text-sm font-semibold hover:bg-blue-50 transition"
+            class="rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1fb85a]"
         >
             Get Pro
         </a>
-    </header>
+    </nav>
+</header>
 
-    <main class="flex flex-col md:flex-row min-h-[calc(100vh-73px)]">
-        <section class="w-full md:w-1/2 flex items-center justify-center p-6 md:p-12 order-1 md:order-2">
-            <div class="w-full max-w-md bg-white text-black rounded-2xl shadow-2xl p-6">
-                <h2 class="text-2xl font-bold">Upload &amp; Convert</h2>
+<main class="mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center gap-8 p-4 py-10 lg:flex-row lg:items-stretch lg:gap-10">
+    <section class="rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-2xl backdrop-blur lg:w-1/2">
+        <span class="inline-flex items-center rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-cyan-300">
+            SmartCheck GST
+        </span>
 
-                <form id="uploadForm" class="mt-5 space-y-4" novalidate>
-                    <div>
-                        <label for="invoiceFile" class="sr-only">Upload Invoice</label>
-                        <div id="dropZone" class="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer hover:bg-gray-50 transition">
-                            <input
-                                type="file"
-                                id="invoiceFile"
-                                name="invoiceFile"
-                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp,.zip,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png,image/webp,application/zip,application/x-zip-compressed,multipart/x-zip,application/x-compressed"
-                                class="hidden"
-                                required
-                            >
-                            <p class="text-base font-semibold">Upload Invoice</p>
-                            <p class="mt-1 text-sm text-gray-500">Drag &amp; drop or click</p>
-                            <p id="selectedFileName" class="mt-2 text-xs text-gray-500"></p>
-                        </div>
-                    </div>
+        <h1 class="mt-5 text-3xl font-bold leading-tight text-white sm:text-4xl">
+            Convert GST invoices to Excel or Tally XML in seconds.
+        </h1>
 
-                    <div>
-                        <p class="text-sm font-medium text-gray-700 mb-2">Output format</p>
-                        <div class="grid grid-cols-2 gap-2 rounded-xl bg-gray-100 p-1">
-                            <label class="cursor-pointer rounded-lg px-3 py-2 text-sm text-center font-medium text-gray-700 transition has-[:checked]:bg-white has-[:checked]:text-blue-700 has-[:checked]:shadow">
-                                <input type="radio" name="outputFormat" value="xlsx" class="sr-only" checked>
-                                Excel
-                            </label>
-                            <label class="cursor-pointer rounded-lg px-3 py-2 text-sm text-center font-medium text-gray-700 transition has-[:checked]:bg-white has-[:checked]:text-blue-700 has-[:checked]:shadow">
-                                <input type="radio" name="outputFormat" value="xml" class="sr-only">
-                                Tally XML
-                            </label>
-                        </div>
-                    </div>
+        <p class="mt-4 text-base leading-7 text-slate-300">
+            Upload a PDF invoice and get structured outputs ready for review, reconciliation, filing, and Tally import.
+            Built for finance teams, CAs, and GST operators who need speed with confidence.
+        </p>
 
-                    <div>
-                        <label for="email" class="text-sm font-medium text-gray-700">Email (optional)</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            autocomplete="email"
-                            placeholder="name@company.com"
-                            class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
-                        >
-                    </div>
+        <div class="mt-8 grid gap-4 sm:grid-cols-2">
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-sm font-semibold text-white">⚡ Faster processing</p>
+                <p class="mt-1 text-sm text-slate-300">Automated extraction replaces repetitive manual entry.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-sm font-semibold text-white">🔒 Supabase-backed security</p>
+                <p class="mt-1 text-sm text-slate-300">Uploads are handled through secure Supabase storage workflows.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-sm font-semibold text-white">✅ GSTIN checksum guardrails</p>
+                <p class="mt-1 text-sm text-slate-300">GSTIN values are accepted only when Mod-36 checksum validation passes.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <p class="text-sm font-semibold text-white">🎁 Free beta quota</p>
+                <p class="mt-1 text-sm text-slate-300">Get 5 free uploads while the product is in beta.</p>
+            </div>
+        </div>
+    </section>
 
-                    <div class="rounded-xl bg-gray-50 p-3 border border-gray-200">
-                        <div class="flex items-center justify-between gap-2">
-                            <p id="usageSummary" class="text-sm font-semibold text-gray-800">Free Plan: 2 / 10 used</p>
-                            <a
-                                id="usageUpgradeButton"
-                                href="https://wa.me/918722250407?text=Hi,%20I%27m%20interested%20in%20the%20GST%20SmartCheck%20Pro%20Plan."
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                class="text-xs font-semibold text-blue-700 hover:underline"
-                            >
-                                Upgrade
-                            </a>
-                        </div>
-                        <div class="h-2 bg-gray-200 rounded mt-2 overflow-hidden">
-                            <div id="usageProgress" class="h-2 bg-blue-500 rounded" style="width: 20%"></div>
-                        </div>
-                    </div>
+    <section class="rounded-3xl border border-white/15 bg-white p-8 text-slate-900 shadow-2xl lg:w-1/2">
+        <div class="mb-6 flex items-center justify-between gap-4">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#4169E1]">Invoice Converter</p>
+                <h2 class="mt-1 text-2xl font-bold">Upload & convert</h2>
+            </div>
+            <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-600">Beta Access</span>
+        </div>
 
-                    <button id="submitButton" type="submit" class="w-full mt-4 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed transition">
-                        <span id="submitButtonText">Upload &amp; Convert</span>
+        <form id="uploadForm" novalidate class="space-y-5">
+            <div>
+                <label for="invoiceFile" id="fileLabel" class="mb-2 block text-sm font-semibold text-slate-700">Upload Invoice</label>
+                <div id="dropZone" class="rounded-xl border-2 border-dashed border-slate-300 bg-slate-50 p-4 transition hover:border-[#4169E1]/60 hover:bg-blue-50/50">
+                    <button id="triggerFileButton" type="button" class="mb-3 flex w-full items-center justify-center gap-2 rounded-xl bg-[#4169E1] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#4169E1]/25 transition hover:bg-[#3558bd]">
+                        📤 Upload Invoice
                     </button>
-                </form>
-
-                <p id="statusMessage" class="mt-3 text-sm text-gray-700" role="status" aria-live="polite"></p>
-
-                <div class="mt-6 p-4 bg-gray-100 rounded-xl">
-                    <p class="text-sm font-semibold text-gray-900">Need unlimited access?</p>
-                    <form id="interestForm" class="mt-3 flex flex-col sm:flex-row gap-2">
-                        <input
-                            type="email"
-                            id="interestEmail"
-                            required
-                            placeholder="Enter your email"
-                            class="flex-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-500"
-                        >
-                        <button id="notifyButton" type="submit" class="rounded-lg bg-slate-900 text-white px-4 py-2.5 text-sm font-semibold hover:bg-slate-800 disabled:bg-slate-400 disabled:cursor-not-allowed">
-                            Notify Me
-                        </button>
-                    </form>
-                    <p id="interestStatus" class="mt-2 text-xs text-gray-600" aria-live="polite"></p>
+                    <input
+                        type="file"
+                        id="invoiceFile"
+                        name="invoiceFile"
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.webp,.zip,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png,image/webp,application/zip,application/x-zip-compressed,multipart/x-zip,application/x-compressed"
+                        multiple
+                        required
+                        class="sr-only"
+                        aria-describedby="fileHint"
+                    >
+                    <p id="fileHint" class="mt-2 text-xs text-slate-500">Drag & drop invoice files here, or use the Upload Invoice button. Supported: PDF, DOC, DOCX, JPG, JPEG, PNG, WEBP, ZIP • Maximum file size: 10MB each</p>
+                    <ul id="fileList" class="mt-3 space-y-1 text-xs text-slate-600"></ul>
                 </div>
             </div>
-        </section>
 
-        <section class="w-full md:w-1/2 flex flex-col justify-center px-6 md:px-12 order-2 md:order-1 pb-10 md:pb-0">
-            <p class="inline-flex w-fit rounded-full bg-white/10 border border-white/20 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-100">
-                AI GST Automation
-            </p>
-            <h1 class="text-4xl md:text-5xl font-bold mt-4 leading-tight">
-                Convert GST invoices to Excel &amp; Tally in seconds
-            </h1>
-            <p class="text-gray-300 mt-4 text-base md:text-lg">
-                Upload PDFs or images. Extract structured GST data instantly with AI.
-            </p>
-            <ul class="mt-6 space-y-3 text-blue-50">
-                <li>✓ AI-powered extraction</li>
-                <li>✓ Works with scanned invoices</li>
-                <li>✓ Export to Excel / Tally</li>
-            </ul>
-        </section>
-    </main>
+            <div>
+                <p class="mb-2 block text-sm font-semibold text-slate-700">Output format</p>
+                <div class="grid grid-cols-2 gap-2 rounded-xl bg-slate-100 p-1">
+                    <label class="flex cursor-pointer items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition has-[:checked]:bg-white has-[:checked]:text-[#4169E1] has-[:checked]:shadow-sm">
+                        <input type="radio" name="outputFormat" value="xlsx" class="sr-only" checked>
+                        Excel (.xlsx)
+                    </label>
+                    <label class="flex cursor-pointer items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition has-[:checked]:bg-white has-[:checked]:text-[#4169E1] has-[:checked]:shadow-sm">
+                        <input type="radio" name="outputFormat" value="xml" class="sr-only">
+                        Tally XML
+                    </label>
+                </div>
+                <p class="mt-2 text-xs text-slate-500">Tally XML exports a Sales voucher payload compatible with Tally ERP 9 / Tally Prime.</p>
+            </div>
 
-    <footer class="w-full border-t border-white/20 bg-white/5 px-6 py-4 text-xs text-blue-100/90 flex flex-col sm:flex-row justify-between gap-2">
-        <p>© <span id="year"></span> SmartCheck GST</p>
-        <p>Built for finance teams, CAs, and GST operators.</p>
-    </footer>
+            <div>
+                <label for="email" class="mb-2 block text-sm font-semibold text-slate-700">Email ID</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    autocomplete="email"
+                    class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    placeholder="name@example.com"
+                    aria-describedby="emailHint"
+                >
+                <label for="rememberEmail" class="mt-3 inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-slate-700">
+                    <input
+                        type="checkbox"
+                        id="rememberEmail"
+                        name="rememberEmail"
+                        class="h-4 w-4 rounded border-slate-300 accent-[#4169E1]"
+                    >
+                    <span>Remember me</span>
+                </label>
+                <p id="emailHint" class="mt-2 text-xs text-slate-500">We only use this for upload tracking and support communication.</p>
+            </div>
+
+            <div id="usagePanel" class="rounded-xl border border-blue-100 bg-blue-50 p-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <p id="usageSummary" class="text-sm font-semibold text-blue-900">Free Plan: 0 / 10 used</p>
+                    <a
+                        id="usageUpgradeButton"
+                        href="https://wa.me/918722250407?text=Hi,%20I%27m%20interested%20in%20the%20GST%20SmartCheck%20Pro%20Plan."
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="inline-flex items-center rounded-lg bg-[#25D366] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#1fb85a]"
+                    >
+                        Upgrade Now
+                    </a>
+                </div>
+                <p id="usageBannerMessage" class="mt-2 hidden text-xs font-medium text-amber-700"></p>
+            </div>
+
+            <button
+                id="submitButton"
+                type="submit"
+                class="flex w-full items-center justify-center gap-2 rounded-xl bg-[#4169E1] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-[#4169E1]/30 transition hover:bg-[#3558bd] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 disabled:shadow-none"
+            >
+                <span id="submitSpinner" class="hidden h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"></span>
+                <span id="submitButtonText">Upload Invoice</span>
+            </button>
+            <a
+                id="limitReachedCta"
+                href="https://wa.me/918722250407?text=Hi,%20I%20need%20more%20invoice%20usage%20on%20SmartCheck%20GST."
+                target="_blank"
+                rel="noopener noreferrer"
+                class="hidden w-full items-center justify-center rounded-xl border border-[#25D366]/40 bg-[#25D366]/10 px-4 py-3 text-sm font-semibold text-[#138a43] transition hover:bg-[#25D366]/20"
+            >
+                Need more usage? Contact on WhatsApp
+            </a>
+            <div class="mt-2 flex justify-end">
+                <button id="reportIssueButton" type="button" class="text-xs font-normal text-blue-600 transition hover:text-blue-700 hover:underline">
+                    Report issue
+                </button>
+            </div>
+        </form>
+
+        <p id="statusMessage" class="mt-4 text-sm" role="status" aria-live="polite"></p>
+
+        <div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <p class="text-sm font-semibold text-slate-900">Need unlimited access?</p>
+            <p class="mt-1 text-xs text-slate-600">Enter your email to get unlimited access</p>
+            <form id="interestForm" class="mt-3 flex flex-col gap-2 sm:flex-row">
+                <input
+                    type="email"
+                    id="interestEmail"
+                    required
+                    class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm shadow-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                    placeholder="Enter your email to get unlimited access"
+                >
+                <button id="notifyButton" type="submit" class="rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500">
+                    Notify Me
+                </button>
+            </form>
+            <p id="interestStatus" class="mt-2 text-xs text-slate-600" aria-live="polite"></p>
+        </div>
+
+        <div class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
+            ⚠ Always verify extracted data before GST filing/import. OCR fallback activates automatically for low-text PDFs.
+        </div>
+
+    </section>
+</main>
+
+<div id="successModal" class="fixed inset-0 z-20 hidden items-center justify-center bg-slate-900/60 p-4">
+    <div class="w-full max-w-md rounded-2xl bg-white p-6 text-slate-900 shadow-2xl">
+        <div class="flex items-center justify-between">
+            <h3 class="text-lg font-bold">Extraction Complete</h3>
+            <button id="closeSuccessModal" type="button" class="text-xl leading-none text-slate-500">&times;</button>
+        </div>
+        <p id="successModalText" class="mt-3 text-sm text-slate-700"></p>
+        <div id="verifiedPill" class="mt-4 hidden items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-600">
+            <span>✅</span>
+            <span>Verified: GSTIN checksum passed</span>
+        </div>
+        <button id="tallyLockedButton" type="button" class="mt-4 w-full rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">🔒 Export Tally XML</button>
+        <p id="tallyLockedMessage" class="mt-2 hidden text-xs text-slate-600">
+            Tally XML is a Pro Feature. Would you like to upgrade?
+            <a href="https://wa.me/918722250407?text=Hi,%20I%27m%20interested%20in%20the%20GST%20SmartCheck%20Pro%20Plan." target="_blank" rel="noopener noreferrer" class="font-semibold text-[#25D366] underline">Chat on WhatsApp</a>
+        </p>
+        <div class="mt-6 flex gap-3">
+            <button id="modalGetProButton" type="button" class="flex-1 rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1fb85a]">Get Pro</button>
+            <button id="modalDoneButton" type="button" class="flex-1 rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100">Done</button>
+        </div>
+    </div>
+</div>
+
+<div id="limitReachedModal" class="fixed inset-0 z-30 hidden items-center justify-center bg-slate-900/70 p-4">
+    <div class="w-full max-w-md rounded-2xl bg-white p-6 text-slate-900 shadow-2xl">
+        <h3 class="text-lg font-bold">Upgrade to Pro</h3>
+        <p class="mt-2 text-sm text-slate-700">Your current plan cannot process this request. Upgrade to Pro for unlimited access.</p>
+        <div class="mt-5 flex gap-3">
+            <button id="limitWhatsappButton" type="button" class="flex-1 rounded-lg bg-[#25D366] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1fb85a]">Chat with Developer for Unlimited Access</button>
+            <button id="closeLimitModalButton" type="button" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700">Close</button>
+        </div>
+    </div>
 </div>
 
 <script>
 (() => {
+    const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
+    const SUPPORTED_FILE_EXTENSIONS = [".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png", ".webp", ".zip"];
+    const SUPPORTED_FILE_MIME_TYPES = new Set([
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "image/jpeg",
+        "image/png",
+        "image/webp",
+        "application/zip",
+        "application/x-zip-compressed",
+        "multipart/x-zip",
+        "application/x-compressed"
+    ]);
     const FREE_UPLOAD_LIMIT = 10;
+    const PRO_USAGE_CAP = 1000;
     const BASE_URL = "https://gst-smartcheck-docker.onrender.com";
     const API_URL = BASE_URL;
     const API_KEY = "free_user_123";
     const uploadEndpoint = `${API_URL}/upload`;
+    const waitlistLink = "https://wa.me/918722250407?text=Hi,%20I%27m%20interested%20in%20the%20GST%20SmartCheck%20Pro%20Plan.";
     const collectEmailEndpoint = `${API_URL}/collect-email`;
 
     const form = document.getElementById("uploadForm");
-    const dropZone = document.getElementById("dropZone");
-    const fileInput = document.getElementById("invoiceFile");
-    const selectedFileName = document.getElementById("selectedFileName");
     const emailInput = document.getElementById("email");
+    const rememberEmailCheckbox = document.getElementById("rememberEmail");
+    const fileInput = document.getElementById("invoiceFile");
+    const dropZone = document.getElementById("dropZone");
+    const triggerFileButton = document.getElementById("triggerFileButton");
+    const fileList = document.getElementById("fileList");
+    const outputFormatInputs = document.querySelectorAll('input[name="outputFormat"]');
     const submitButton = document.getElementById("submitButton");
     const submitButtonText = document.getElementById("submitButtonText");
+    const submitSpinner = document.getElementById("submitSpinner");
     const statusMessage = document.getElementById("statusMessage");
     const usageSummary = document.getElementById("usageSummary");
-    const usageProgress = document.getElementById("usageProgress");
+    const usageBannerMessage = document.getElementById("usageBannerMessage");
     const usageUpgradeButton = document.getElementById("usageUpgradeButton");
-
+    const limitReachedCta = document.getElementById("limitReachedCta");
     const interestForm = document.getElementById("interestForm");
     const interestEmail = document.getElementById("interestEmail");
     const notifyButton = document.getElementById("notifyButton");
     const interestStatus = document.getElementById("interestStatus");
-
-    const year = document.getElementById("year");
-    year.textContent = String(new Date().getFullYear());
+    const successModal = document.getElementById("successModal");
+    const successModalText = document.getElementById("successModalText");
+    const closeSuccessModal = document.getElementById("closeSuccessModal");
+    const modalDoneButton = document.getElementById("modalDoneButton");
+    const verifiedPill = document.getElementById("verifiedPill");
+    const navGetProButton = document.getElementById("navGetProButton");
+    const modalGetProButton = document.getElementById("modalGetProButton");
+    const tallyLockedButton = document.getElementById("tallyLockedButton");
+    const tallyLockedMessage = document.getElementById("tallyLockedMessage");
+    const reportIssueButton = document.getElementById("reportIssueButton");
+    const limitReachedModal = document.getElementById("limitReachedModal");
+    const limitWhatsappButton = document.getElementById("limitWhatsappButton");
+    const closeLimitModalButton = document.getElementById("closeLimitModalButton");
 
     let usageState = {
-        usage: 2,
-        remaining: FREE_UPLOAD_LIMIT - 2,
+        usage: 0,
+        remaining: FREE_UPLOAD_LIMIT,
         plan: "free"
+    };
+    let latestExtraction = {
+        invoiceNumber: "N/A",
+        taxableAmount: "N/A",
+        finalAmount: "N/A",
+        validationStatus: "Unknown"
+    };
+
+    const openWaitlist = () => {
+        window.open(waitlistLink, "_blank", "noopener,noreferrer");
+    };
+
+    const readValue = (value, fallback = "N/A") => {
+        if (value === null || value === undefined || value === "") {
+            return fallback;
+        }
+        return value;
+    };
+
+    const reportToWhatsApp = () => {
+        const uiInvoiceNumber = document.getElementById("invoiceNumber")?.textContent?.trim();
+        const uiTaxableAmount = document.getElementById("taxableAmount")?.textContent?.trim();
+        const uiFinalAmount = document.getElementById("finalAmount")?.textContent?.trim();
+        const uiValidationStatus = document.getElementById("validationStatus")?.textContent?.trim();
+
+        const invoiceNumber = readValue(uiInvoiceNumber || latestExtraction.invoiceNumber);
+        const taxableAmount = readValue(uiTaxableAmount || latestExtraction.taxableAmount);
+        const finalAmount = readValue(uiFinalAmount || latestExtraction.finalAmount);
+        const validationStatus = readValue(uiValidationStatus || latestExtraction.validationStatus, "Unknown");
+
+        const message = `Hi, I found an issue with Invoice #${invoiceNumber}. Tool extracted taxable ${taxableAmount} and final ${finalAmount} but it looks wrong. Status: ${validationStatus}. Please help!`;
+        const whatsappUrl = `https://wa.me/918722250407?text=${encodeURIComponent(message)}`;
+        window.open(whatsappUrl, "_blank", "noopener,noreferrer");
+    };
+
+    const downloadBlob = (blob, filename) => {
+        const blobUrl = URL.createObjectURL(blob);
+        const anchor = document.createElement("a");
+        anchor.href = blobUrl;
+        anchor.download = filename;
+        document.body.appendChild(anchor);
+        anchor.click();
+        anchor.remove();
+        URL.revokeObjectURL(blobUrl);
+    };
+
+    const getDownloadFilename = (response, fallback = "tally-export.xml") => {
+        const contentDisposition = response.headers.get("Content-Disposition") || "";
+        const filenameMatch = contentDisposition.match(/filename\*?=(?:UTF-8''|\")?([^\";]+)/i);
+        if (!filenameMatch) {
+            return fallback;
+        }
+
+        return decodeURIComponent(filenameMatch[1]).replace(/[/\\]/g, "_");
+    };
+
+    const downloadTallyXml = async (invoiceId) => {
+        const response = await fetch(`${BASE_URL}/export/tally?invoice_id=${encodeURIComponent(invoiceId)}`);
+        if (!response.ok) {
+            let errorMessage = "Unable to export Tally XML right now.";
+            try {
+                const errorData = await response.json();
+                errorMessage = errorData.error || errorMessage;
+            } catch {
+                // Non-JSON error response fallback
+            }
+            throw new Error(errorMessage);
+        }
+
+        const xmlBlob = await response.blob();
+        const filename = getDownloadFilename(response, `invoice-${invoiceId}.xml`);
+        downloadBlob(xmlBlob, filename);
+    };
+
+    const setTallyButtonLockedState = () => {
+        tallyLockedButton.textContent = "🔒 Export Tally XML";
+        tallyLockedButton.classList.remove("border-emerald-200", "text-emerald-700", "hover:bg-emerald-50");
+        tallyLockedButton.classList.add("border-slate-300", "text-slate-700", "hover:bg-slate-100");
+        tallyLockedButton.dataset.locked = "true";
+        tallyLockedButton.removeAttribute("data-invoice-id");
+        tallyLockedMessage.classList.add("hidden");
+    };
+
+    const setTallyButtonUnlockedState = (invoiceId) => {
+        tallyLockedButton.textContent = "Export Tally XML";
+        tallyLockedButton.classList.remove("border-slate-300", "text-slate-700", "hover:bg-slate-100");
+        tallyLockedButton.classList.add("border-emerald-200", "text-emerald-700", "hover:bg-emerald-50");
+        tallyLockedButton.dataset.locked = "false";
+        tallyLockedButton.dataset.invoiceId = invoiceId;
+        tallyLockedMessage.classList.add("hidden");
+    };
+
+    const updateUsageDisplay = () => {
+        const safeUsage = Number(usageState.usage) || 0;
+        const safeRemaining = Number(usageState.remaining);
+        const plan = String(usageState.plan || "free").toLowerCase();
+        const isFreePlan = plan !== "pro";
+        const isLimitReached = isFreePlan && Number.isFinite(safeRemaining) && safeRemaining <= 0;
+
+        if (plan === "pro") {
+            usageSummary.textContent = `Pro Plan: Unlimited / ${PRO_USAGE_CAP}`;
+            usageBannerMessage.classList.add("hidden");
+            usageBannerMessage.textContent = "";
+        } else {
+            const normalizedUsage = Math.max(0, Math.min(safeUsage, FREE_UPLOAD_LIMIT));
+            usageSummary.textContent = `Free Plan: ${normalizedUsage} / ${FREE_UPLOAD_LIMIT} used`;
+
+            if (Number.isFinite(safeRemaining) && safeRemaining === 0) {
+                usageBannerMessage.textContent = "You’ve reached your free limit. Upgrade coming soon.";
+                usageBannerMessage.classList.remove("hidden");
+            } else if (Number.isFinite(safeRemaining) && safeRemaining <= 3) {
+                usageBannerMessage.textContent = "You are nearing your free limit 🚀";
+                usageBannerMessage.classList.remove("hidden");
+            } else {
+                usageBannerMessage.classList.add("hidden");
+                usageBannerMessage.textContent = "";
+            }
+        }
+
+        submitButton.disabled = isLimitReached;
+        fileInput.disabled = isLimitReached;
+        triggerFileButton.disabled = isLimitReached;
+        triggerFileButton.classList.toggle("opacity-60", isLimitReached);
+        triggerFileButton.classList.toggle("cursor-not-allowed", isLimitReached);
+        limitReachedCta.classList.toggle("hidden", !isLimitReached);
+        limitReachedCta.classList.toggle("inline-flex", isLimitReached);
+        submitButtonText.textContent = isLimitReached ? "Free Limit Reached" : getSubmitButtonLabel();
+    };
+
+    const syncUsageState = ({ usage, remaining, plan }) => {
+        if (usage !== null && usage !== undefined && !Number.isNaN(Number(usage))) {
+            usageState.usage = Number(usage);
+        }
+        if (remaining !== null && remaining !== undefined && !Number.isNaN(Number(remaining))) {
+            usageState.remaining = Number(remaining);
+        }
+        if (plan) {
+            usageState.plan = String(plan).toLowerCase();
+        }
+
+        updateUsageDisplay();
+    };
+
+    const openSuccessModal = (message, isVerified) => {
+        successModalText.textContent = message;
+        verifiedPill.classList.toggle("hidden", !isVerified);
+        verifiedPill.classList.toggle("flex", isVerified);
+        successModal.classList.remove("hidden");
+        successModal.classList.add("flex");
+    };
+
+    const closeModal = () => {
+        successModal.classList.remove("flex");
+        successModal.classList.add("hidden");
+        tallyLockedMessage.classList.add("hidden");
+    };
+
+    const openLimitReachedModal = () => {
+        limitReachedModal.classList.remove("hidden");
+        limitReachedModal.classList.add("flex");
+    };
+
+    const closeLimitReachedModal = () => {
+        limitReachedModal.classList.remove("flex");
+        limitReachedModal.classList.add("hidden");
     };
 
     const getOutputFormat = () => document.querySelector('input[name="outputFormat"]:checked')?.value || "xlsx";
 
-    const updateUsageDisplay = () => {
-        const isPro = usageState.plan === "pro";
-        const usage = Number.isFinite(Number(usageState.usage)) ? Number(usageState.usage) : 0;
-        const remaining = Number.isFinite(Number(usageState.remaining)) ? Number(usageState.remaining) : FREE_UPLOAD_LIMIT;
+    const rememberEmailStorageKey = "smartcheck.rememberedEmail";
 
-        if (isPro) {
-            usageSummary.textContent = "Pro Plan: Unlimited";
-            usageProgress.style.width = "100%";
-            submitButton.disabled = false;
+    const loadRememberedEmail = () => {
+        const savedEmail = localStorage.getItem(rememberEmailStorageKey);
+        if (!savedEmail) {
             return;
         }
 
-        const clampedUsage = Math.max(0, Math.min(usage, FREE_UPLOAD_LIMIT));
-        const percentage = Math.min(100, Math.round((clampedUsage / FREE_UPLOAD_LIMIT) * 100));
-        usageSummary.textContent = `Free Plan: ${clampedUsage} / ${FREE_UPLOAD_LIMIT} used`;
-        usageProgress.style.width = `${percentage}%`;
+        emailInput.value = savedEmail;
+        rememberEmailCheckbox.checked = true;
+    };
 
-        const limitReached = remaining <= 0;
-        submitButton.disabled = limitReached;
-        if (limitReached) {
-            statusMessage.textContent = "Free limit reached. Upgrade to continue.";
-            statusMessage.className = "mt-3 text-sm text-red-600";
+    const handleRememberedEmailState = () => {
+        if (!rememberEmailCheckbox.checked) {
+            localStorage.removeItem(rememberEmailStorageKey);
+            return;
+        }
+
+        const email = emailInput.value.trim();
+        if (email) {
+            localStorage.setItem(rememberEmailStorageKey, email);
         }
     };
 
-    const setLoadingState = (isLoading) => {
-        submitButton.disabled = isLoading || (usageState.plan !== "pro" && usageState.remaining <= 0);
-        submitButtonText.textContent = isLoading ? "Processing..." : "Upload & Convert";
-    };
-
     const setStatus = (message, tone = "info") => {
-        const toneClass = tone === "success"
-            ? "mt-3 text-sm text-emerald-600"
-            : tone === "error"
-                ? "mt-3 text-sm text-red-600"
-                : "mt-3 text-sm text-gray-700";
-        statusMessage.className = toneClass;
+        const toneClasses = {
+            info: "text-slate-700",
+            success: "text-emerald-600",
+            error: "text-red-600"
+        };
+
+        statusMessage.classList.remove("text-slate-700", "text-emerald-600", "text-red-600");
+        statusMessage.classList.add(toneClasses[tone] || toneClasses.info);
         statusMessage.textContent = message;
     };
 
-    const showSelectedFile = () => {
-        const file = fileInput.files?.[0];
-        selectedFileName.textContent = file ? `Selected: ${file.name}` : "";
+    const getSubmitButtonLabel = () => {
+        const format = getOutputFormat();
+        return format === "xml" ? "Upload & Export XML" : "Upload & Convert";
     };
 
-    dropZone.addEventListener("click", () => fileInput.click());
-    fileInput.addEventListener("change", showSelectedFile);
+    const setLoadingState = (isLoading, label = getSubmitButtonLabel()) => {
+        const hardDisabled = usageState.plan !== "pro" && Number(usageState.remaining) <= 0;
+        submitButton.disabled = isLoading || hardDisabled;
+        submitButtonText.textContent = isLoading ? label : getSubmitButtonLabel();
+        submitSpinner.classList.toggle("hidden", !isLoading);
+    };
 
+    const isSupportedFile = (file) => {
+        const fileName = (file.name || "").toLowerCase();
+        const fileType = (file.type || "").toLowerCase();
+        const hasSupportedExtension = SUPPORTED_FILE_EXTENSIONS.some((extension) => fileName.endsWith(extension));
+        const hasSupportedMimeType = SUPPORTED_FILE_MIME_TYPES.has(fileType);
+        return hasSupportedExtension || hasSupportedMimeType;
+    };
+
+    const renderSelectedFiles = () => {
+        const files = Array.from(fileInput.files || []);
+        if (!files.length) {
+            fileList.innerHTML = "";
+            return;
+        }
+
+        fileList.innerHTML = files
+            .slice(0, 5)
+            .map((file) => `<li class="rounded-md bg-white px-2 py-1">📄 ${file.name}</li>`)
+            .join("");
+
+        if (files.length > 5) {
+            fileList.innerHTML += `<li class="text-slate-500">+${files.length - 5} more selected</li>`;
+        }
+    };
+
+    const validateInput = () => {
+        const files = Array.from(fileInput.files || []);
+
+        if (!emailInput.checkValidity()) {
+            setStatus("❌ Please enter a valid email ID.", "error");
+            emailInput.focus();
+            return null;
+        }
+
+        if (!files.length) {
+            setStatus("❌ Please upload an invoice in a supported format.", "error");
+            fileInput.focus();
+            return null;
+        }
+
+        for (const file of files) {
+            if (!isSupportedFile(file)) {
+                setStatus(`❌ ${file.name} is not supported. Upload PDF, DOC, DOCX, JPG, JPEG, PNG, WEBP, or ZIP files.`, "error");
+                fileInput.focus();
+                return null;
+            }
+
+            if (file.size > MAX_FILE_SIZE_BYTES) {
+                setStatus(`❌ ${file.name} is too large. Upload a file smaller than 10MB.`, "error");
+                fileInput.focus();
+                return null;
+            }
+        }
+
+        return files;
+    };
+
+    const uploadSingleFile = async (email, file, outputFormat) => {
+        const formData = new FormData();
+        formData.append("email", email);
+        formData.append("file", file);
+        formData.append("output_format", outputFormat || "xlsx");
+
+        const response = await fetch(uploadEndpoint, {
+            method: "POST",
+            headers: {
+                "x-api-key": API_KEY
+            },
+            body: formData
+        });
+
+        if (!response.ok) {
+            let message = `Upload failed for ${file.name}.`;
+            let action = null;
+            let usage = null;
+            let remaining = null;
+            let plan = null;
+            try {
+                const errorData = await response.json();
+                message = errorData.error || message;
+                action = errorData.action || null;
+                usage = errorData.usage;
+                remaining = errorData.remaining;
+                plan = errorData.plan;
+            } catch {
+                // Non-JSON error response fallback
+            }
+            const error = new Error(message);
+            error.code = response.status;
+            error.action = action;
+            error.usage = usage;
+            error.remaining = remaining;
+            error.plan = plan;
+            throw error;
+        }
+
+        const payload = await response.json();
+        return { payload, response };
+    };
+
+    outputFormatInputs.forEach((input) => input.addEventListener("change", () => setLoadingState(false)));
+    fileInput.addEventListener("change", renderSelectedFiles);
+    triggerFileButton.addEventListener("click", () => {
+        if (!triggerFileButton.disabled) {
+            fileInput.click();
+        }
+    });
     ["dragenter", "dragover"].forEach((eventName) => {
         dropZone.addEventListener(eventName, (event) => {
             event.preventDefault();
-            dropZone.classList.add("bg-gray-50", "border-blue-400");
+            event.stopPropagation();
+            dropZone.classList.add("border-[#4169E1]", "bg-blue-50");
         });
     });
-
     ["dragleave", "drop"].forEach((eventName) => {
         dropZone.addEventListener(eventName, (event) => {
             event.preventDefault();
-            dropZone.classList.remove("bg-gray-50", "border-blue-400");
+            event.stopPropagation();
+            dropZone.classList.remove("border-[#4169E1]", "bg-blue-50");
         });
     });
-
     dropZone.addEventListener("drop", (event) => {
+        if (triggerFileButton.disabled) {
+            return;
+        }
         const droppedFiles = event.dataTransfer?.files;
         if (!droppedFiles?.length) {
             return;
         }
         fileInput.files = droppedFiles;
-        showSelectedFile();
+        renderSelectedFiles();
     });
-
-    usageUpgradeButton.addEventListener("click", () => {
-        // default anchor behavior
-    });
+    rememberEmailCheckbox.addEventListener("change", handleRememberedEmailState);
+    emailInput.addEventListener("input", handleRememberedEmailState);
+    loadRememberedEmail();
 
     form.addEventListener("submit", async (event) => {
         event.preventDefault();
-        const file = fileInput.files?.[0];
 
-        if (!file) {
-            setStatus("Please upload an invoice file.", "error");
+        const files = validateInput();
+        if (!files) {
             return;
         }
 
-        const formData = new FormData();
-        formData.append("email", emailInput.value.trim());
-        formData.append("file", file);
-        formData.append("output_format", getOutputFormat());
+        const email = emailInput.value.trim();
+        if (rememberEmailCheckbox.checked) {
+            localStorage.setItem(rememberEmailStorageKey, email);
+        }
+        const outputFormat = getOutputFormat();
+        const outputLabel = outputFormat === "xml" ? "Tally XML" : "Excel";
 
-        setLoadingState(true);
-        setStatus("Processing...", "info");
+        setLoadingState(true, "Processing...");
+        setStatus(`Uploading invoice and preparing ${outputLabel} output...`, "info");
 
         try {
-            const response = await fetch(uploadEndpoint, {
-                method: "POST",
-                headers: {
-                    "x-api-key": API_KEY
-                },
-                body: formData
-            });
+            let successCount = 0;
+            const failedFiles = [];
+            let checksumPassed = false;
+            let lastResult = null;
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || "Upload failed. Please try again.");
+            for (let index = 0; index < files.length; index += 1) {
+                const file = files[index];
+                setLoadingState(true, `Processing ${index + 1}/${files.length}...`);
+
+                try {
+                    const { payload, response } = await uploadSingleFile(email, file, outputFormat);
+                    const result = payload?.data || payload;
+                    syncUsageState({
+                        usage: payload?.usage,
+                        remaining: payload?.remaining,
+                        plan: payload?.plan
+                    });
+                    checksumPassed = checksumPassed || response.headers.get("X-GSTIN-Checksum") === "pass";
+
+                    if (outputFormat === "xml" && result?.xml_content) {
+                        const xmlBlob = new Blob([result.xml_content], { type: "application/xml" });
+                        const xmlFilename = `${(file.name || "invoice").replace(/\.[^.]+$/i, "")}.xml`;
+                        downloadBlob(xmlBlob, xmlFilename);
+                    } else {
+                        latestExtraction = {
+                            invoiceNumber: readValue(result?.invoice_number || result?.invoiceNumber || result?.invoice_no),
+                            taxableAmount: readValue(result?.taxable_amount || result?.taxableAmount || result?.taxable_value),
+                            finalAmount: readValue(result?.final_amount || result?.finalAmount || result?.total_amount),
+                            validationStatus: readValue(result?.validation_status || result?.validationStatus || "Unknown", "Unknown")
+                        };
+                        const filename = result?.file_url?.split("/").pop();
+                        if (!filename) {
+                            throw new Error(`Missing download URL for ${file.name}.`);
+                        }
+                        window.location.href = `${BASE_URL}/downloads/${filename}`;
+                        lastResult = result;
+                    }
+
+                    successCount += 1;
+                } catch (error) {
+                    if (error.code === 403 || error.action === "upgrade") {
+                        throw error;
+                    }
+                    failedFiles.push(`${file.name}: ${error.message}`);
+                }
             }
 
-            const payload = await response.json();
-            const result = payload?.data || payload;
+            const remainingMessage = Number.isFinite(usageState.remaining)
+                ? ` Free uploads remaining: ${usageState.remaining}.`
+                : "";
 
-            usageState = {
-                usage: Number(payload?.usage ?? usageState.usage + 1),
-                remaining: Number(payload?.remaining ?? Math.max(0, usageState.remaining - 1)),
-                plan: String(payload?.plan || usageState.plan).toLowerCase()
-            };
-            updateUsageDisplay();
-
-            if (result?.file_url) {
-                window.location.assign(result.file_url);
+            if (failedFiles.length === 0) {
+                const completionMessage = `✅ Conversion complete. Your ${outputLabel} file is downloading.${remainingMessage}`;
+                setStatus(completionMessage, "success");
+                if (lastResult?.can_download_xml && lastResult?.invoice_id) {
+                    setTallyButtonUnlockedState(lastResult.invoice_id);
+                } else {
+                    setTallyButtonLockedState();
+                }
+                if (outputFormat === "xml") {
+                    openSuccessModal(completionMessage, checksumPassed);
+                }
+            } else if (successCount > 0) {
+                setStatus(
+                    `⚠ Processed ${successCount}/${files.length} files. Some files failed: ${failedFiles.join(" | ")}`,
+                    "error"
+                );
+            } else {
+                throw new Error(failedFiles.join(" | ") || "Upload failed. Please try again.");
             }
 
-            setStatus("File processed successfully ✅", "success");
             form.reset();
-            selectedFileName.textContent = "";
+            renderSelectedFiles();
         } catch (error) {
-            setStatus(error.message || "Backend not reachable.", "error");
+            const errorMessage = error.message || "Backend not reachable.";
+            syncUsageState({
+                usage: error.usage,
+                remaining: error.remaining,
+                plan: error.plan
+            });
+            setStatus(`❌ ${errorMessage}`, "error");
+
+            const isLimitReached = usageState.plan !== "pro" && Number(usageState.remaining) <= 0;
+            const shouldPromptUpgrade =
+                error.code === 403 ||
+                error.action === "upgrade" ||
+                isLimitReached ||
+                /limit reached|quota|free uploads/i.test(errorMessage);
+
+            if (shouldPromptUpgrade) {
+                if (error.code === 403) {
+                    setStatus("❌ Free limit reached. Upgrade to continue.", "error");
+                }
+                openLimitReachedModal();
+            }
         } finally {
             setLoadingState(false);
         }
     });
 
+    modalGetProButton.addEventListener("click", openWaitlist);
+    tallyLockedButton.addEventListener("click", async () => {
+        const canDownloadXml = tallyLockedButton.dataset.locked === "false" && tallyLockedButton.dataset.invoiceId;
+
+        if (!canDownloadXml) {
+            tallyLockedMessage.classList.remove("hidden");
+            return;
+        }
+
+        const invoiceId = tallyLockedButton.dataset.invoiceId;
+
+        try {
+            setStatus("Preparing your Tally XML download...", "info");
+            await downloadTallyXml(invoiceId);
+            setStatus("✅ Tally XML download started.", "success");
+            tallyLockedMessage.classList.add("hidden");
+        } catch (error) {
+            setStatus(`❌ ${error.message || "Unable to download Tally XML."}`, "error");
+        }
+    });
+    reportIssueButton.addEventListener("click", reportToWhatsApp);
+    closeSuccessModal.addEventListener("click", closeModal);
+    modalDoneButton.addEventListener("click", closeModal);
+    successModal.addEventListener("click", (event) => {
+        if (event.target === successModal) {
+            closeModal();
+        }
+    });
+    limitWhatsappButton.addEventListener("click", openWaitlist);
+    closeLimitModalButton.addEventListener("click", closeLimitReachedModal);
+    limitReachedModal.addEventListener("click", (event) => {
+        if (event.target === limitReachedModal) {
+            closeLimitReachedModal();
+        }
+    });
+    usageUpgradeButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        openWaitlist();
+    });
     const setInterestStatus = (message, tone = "info") => {
-        interestStatus.className = tone === "success"
-            ? "mt-2 text-xs text-emerald-700"
-            : tone === "error"
-                ? "mt-2 text-xs text-red-600"
-                : "mt-2 text-xs text-gray-600";
+        const toneClasses = {
+            info: "mt-2 text-xs text-slate-600",
+            success: "mt-2 text-xs text-emerald-700",
+            error: "mt-2 text-xs text-red-600"
+        };
+
         interestStatus.textContent = message;
+        interestStatus.className = toneClasses[tone] || toneClasses.info;
     };
 
     const syncNotifyButtonState = () => {
         notifyButton.disabled = !interestEmail.value.trim();
     };
 
-    interestEmail.addEventListener("input", syncNotifyButtonState);
-
-    interestForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
+    const handleEmailSubmit = async () => {
         const email = interestEmail.value.trim();
 
-        if (!email || !email.includes("@")) {
+        if (!email.includes("@")) {
             setInterestStatus("Please enter a valid email address.", "error");
+            interestEmail.focus();
             return;
         }
 
@@ -340,26 +840,42 @@
                     "Content-Type": "application/x-www-form-urlencoded",
                     "x-api-key": API_KEY
                 },
-                body: new URLSearchParams({ email })
+                body: new URLSearchParams({
+                    email
+                })
             });
 
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.error || "Could not save your email right now.");
+                let errorText = "Could not save your email right now.";
+                try {
+                    const errorPayload = await response.json();
+                    errorText = errorPayload.error || errorText;
+                } catch {
+                    // ignore parse errors
+                }
+                throw new Error(errorText);
             }
 
-            setInterestStatus("Thanks! We’ll notify you when Pro unlocks.", "success");
+            setInterestStatus("Thanks! We’ll notify you 🚀 ✔ Email saved", "success");
             interestEmail.value = "";
         } catch (error) {
             setInterestStatus(error.message || "Could not save your email right now.", "error");
         } finally {
             syncNotifyButtonState();
         }
+    };
+
+    interestEmail.addEventListener("input", syncNotifyButtonState);
+    interestForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        await handleEmailSubmit();
     });
 
     updateUsageDisplay();
+    setTallyButtonLockedState();
     syncNotifyButtonState();
 })();
 </script>
+
 </body>
 </html>
