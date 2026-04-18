@@ -8,10 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="min-h-screen bg-slate-950 text-slate-100 lg:h-screen lg:overflow-hidden">
+<body class="min-h-screen bg-slate-950 text-slate-100">
 <div class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,#1e3a8a,transparent_55%),radial-gradient(circle_at_80%_20%,#0f766e,transparent_40%),radial-gradient(circle_at_20%_80%,#4f46e5,transparent_45%)] opacity-60"></div>
 
-<header class="w-full px-4 pt-4 sm:px-6 lg:px-8 lg:pt-6">
+<header class="mx-auto w-full max-w-6xl px-4 pt-6">
     <nav class="flex items-center justify-between rounded-2xl border border-white/10 bg-slate-900/70 px-4 py-3 shadow-lg backdrop-blur">
         <p class="text-sm font-semibold tracking-wide text-slate-100">SmartCheck GST</p>
         <a
@@ -26,9 +26,8 @@
     </nav>
 </header>
 
-<main class="w-full p-4 sm:px-6 lg:flex-1 lg:min-h-0 lg:px-8 lg:pb-6 lg:pt-4">
-    <div class="grid h-full w-full gap-6 lg:grid-cols-12">
-    <section class="rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-2xl backdrop-blur lg:col-span-5 lg:h-full lg:overflow-y-auto">
+<main class="mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center gap-8 p-4 py-10 lg:flex-row lg:items-stretch lg:gap-10">
+    <section class="rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-2xl backdrop-blur lg:w-1/2">
         <span class="inline-flex items-center rounded-full border border-cyan-400/40 bg-cyan-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-cyan-300">
             SmartCheck GST
         </span>
@@ -62,7 +61,7 @@
         </div>
     </section>
 
-    <section class="rounded-3xl border border-white/15 bg-white p-8 text-slate-900 shadow-2xl lg:col-span-7 lg:h-full lg:overflow-y-auto">
+    <section class="rounded-3xl border border-white/15 bg-white p-8 text-slate-900 shadow-2xl lg:w-1/2">
         <div class="mb-6 flex items-center justify-between gap-4">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-[#4169E1]">Invoice Converter</p>
@@ -197,7 +196,6 @@
         </div>
 
     </section>
-    </div>
 </main>
 
 <div id="successModal" class="fixed inset-0 z-20 hidden items-center justify-center bg-slate-900/60 p-4">
